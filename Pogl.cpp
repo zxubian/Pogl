@@ -10,11 +10,11 @@
 #include <glm/gtc/type_ptr.hpp>
 
 // Window Dimensions
-constexpr GLint window_width = 800, window_height = 800;
+constexpr GLint window_width = 800, window_height = 600;
 
 GLuint vao, ibo, shader;
 GLuint vbo[2];
-GLint uniform_model_matrix;
+GLint uniform_model_matrix, uniform_projection_matrix;
 
 constexpr float tau = 6.28318531f;
 constexpr float to_radians = tau / 360.f;
@@ -32,8 +32,10 @@ layout (location = 1) in vec4 col;                       \n\
 \n\
 out vec4 vertexColor;\n\
 uniform mat4 model_matrix; \n\
+uniform mat4 projection_matrix; \n\
+\n\
 void main(){											 \n\
-    gl_Position = model_matrix * vec4(pos.xyz, 1.0f);      \n\
+    gl_Position = projection_matrix * model_matrix * vec4(pos.xyz, 1.0f);      \n\
 	vertexColor = col;\n\
 }                                                        \n\
 ";
@@ -162,6 +164,7 @@ void compile_shaders()
 	}
 
 	uniform_model_matrix = glGetUniformLocation(shader, "model_matrix");
+	uniform_projection_matrix = glGetUniformLocation(shader, "projection_matrix");
 }
 
 int main()
@@ -225,6 +228,7 @@ int main()
 	compile_shaders();
 
 	glm::mat4 model_matrix(1.0f);
+	glm::mat4 projection_matrix = glm::perspective(45.0f, (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.f);
 
 	// Loop until window closed
 	while(!glfwWindowShouldClose(main_window))
@@ -248,6 +252,7 @@ int main()
 		{
 			current_angle -= 360;
 		}
+		model_matrix = glm::translate(model_matrix,glm::vec3(0, -1, -5));
 		model_matrix = glm::scale(model_matrix, glm::vec3(current_scale, current_scale, current_scale));
 		model_matrix = glm::rotate(model_matrix, current_angle * to_radians, glm::vec3(0, 1, 0));
 
@@ -257,6 +262,7 @@ int main()
 
 		glUseProgram(shader);
 		glUniformMatrix4fv(uniform_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
+		glUniformMatrix4fv(uniform_projection_matrix, 1, GL_FALSE, glm::value_ptr(projection_matrix));
 		glBindVertexArray(vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
