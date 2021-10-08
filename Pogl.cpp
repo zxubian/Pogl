@@ -51,19 +51,19 @@ void main(){                                             \n\
 }                                                        \n\
 ";
 
-void create_triangle()
+mesh* create_tetrahedron()
 {
-	glm::uint indicies[] = {
+	const glm::uint indicies[] = {
 		0,3,1,
 		1,3,2,
 		2,3,0,
 		0,1,2
 	};
 
-	auto cos_theta = cos(120.f * to_radians);
-	auto sin_theta = sin(120.f * to_radians);
+	const auto cos_theta = cos(120.f * to_radians);
+	const auto sin_theta = sin(120.f * to_radians);
 
-	GLfloat vertices[] =
+	const GLfloat vertices[] =
 	{
 		1.0f,0.f,0.f,
 		cos_theta, 0,sin_theta,
@@ -79,35 +79,9 @@ void create_triangle()
 		1.0f,1.f,0.f,1.f
 	};
 
-	glGenVertexArrays(1, &vao);
-	glBindVertexArray(vao);
-	// from now on, any code using vertex arrays will use the one who's id is vao;
-	glGenBuffers(2, vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-	{
-		glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
-
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-		glEnableVertexAttribArray(0);
-	}
-
-	glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
-	{
-		glBufferData(GL_ARRAY_BUFFER, sizeof(colors), colors, GL_STATIC_DRAW);
-		glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
-		glEnableVertexAttribArray(1);
-
-	}
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	glGenBuffers(1, &ibo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	{
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indicies), indicies, GL_STATIC_DRAW);
-	}
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-	glBindVertexArray(0);
+	const auto tetrahedron = new mesh();
+	tetrahedron->create_mesh(vertices, colors, indicies, 12, 12);
+	return tetrahedron;
 }
 
 void compile_and_add_shader(GLuint program, const char* shader_code, GLenum shader_type)
@@ -224,7 +198,7 @@ int main()
 	//Setup viewport size
 	glViewport(0, 0, buffer_width, buffer_height);
 
-	create_triangle();
+	mesh* tetrahedron = create_tetrahedron();
 	compile_shaders();
 
 	glm::mat4 model_matrix(1.0f);
@@ -263,13 +237,9 @@ int main()
 		glUseProgram(shader);
 		glUniformMatrix4fv(uniform_model_matrix, 1, GL_FALSE, glm::value_ptr(model_matrix));
 		glUniformMatrix4fv(uniform_projection_matrix, 1, GL_FALSE, glm::value_ptr(projection_matrix));
-		glBindVertexArray(vao);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
-		glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
+		tetrahedron->render_mesh();
 
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-		glBindVertexArray(0);
 		glUseProgram(0);
 
 		glfwSwapBuffers(main_window);
