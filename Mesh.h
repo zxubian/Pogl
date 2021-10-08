@@ -2,10 +2,10 @@
 
 #include <gl/glew.h>
 
-class mesh
+class Mesh
 {
 public:
-	mesh();
+	Mesh();
 
 	void create_mesh
 	(
@@ -16,7 +16,7 @@ public:
 	void render_mesh() const;
 	void clear_mesh();
 
-	~mesh();
+	~Mesh();
 private:
 	GLuint vao, ibo;
 	GLuint* vbos;

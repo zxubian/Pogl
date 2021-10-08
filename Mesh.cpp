@@ -1,8 +1,8 @@
-#include "mesh.h"
+#include "Mesh.h"
 
 #include <cstdlib>
 
-mesh::mesh()
+Mesh::Mesh()
 {
 	vao = 0;
 	ibo = 0;
@@ -11,7 +11,7 @@ mesh::mesh()
 	has_colors = false;
 }
 
-void mesh::create_mesh
+void Mesh::create_mesh
 (
 	const GLfloat* vertices, const GLfloat* colors, const unsigned int* indices, 
 	const GLsizei vertex_count, const GLsizei index_count
@@ -42,7 +42,7 @@ void mesh::create_mesh
 	{
 		glBindBuffer(GL_ARRAY_BUFFER, vbos[1]);
 		{
-			glBufferData(GL_ARRAY_BUFFER, 4 * vertex_count * sizeof(colors[1]), colors, GL_STATIC_DRAW);
+			glBufferData(GL_ARRAY_BUFFER, vertex_count * 4 * sizeof(colors[1]), colors, GL_STATIC_DRAW);
 			glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, 0, nullptr);
 			glEnableVertexAttribArray(1);
 		}
@@ -59,7 +59,7 @@ void mesh::create_mesh
 	auto error = glGetError();
 }
 
-void mesh::render_mesh() const
+void Mesh::render_mesh() const
 {
 	glBindVertexArray(vao);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -68,7 +68,7 @@ void mesh::render_mesh() const
 	glBindVertexArray(0);
 }
 
-void mesh::clear_mesh()
+void Mesh::clear_mesh()
 {
 	if(ibo != 0)
 	{
@@ -90,7 +90,7 @@ void mesh::clear_mesh()
 	index_count = 0;
 }
 
-mesh::~mesh()
+Mesh::~Mesh()
 {
 	clear_mesh();
 }
