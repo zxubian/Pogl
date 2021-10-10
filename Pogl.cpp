@@ -52,7 +52,7 @@ Mesh* create_tetrahedron()
 void update_camera(Camera& camera, const Input_state& input_state, const double& delta_time)
 {
 	constexpr GLfloat camera_move_speed = 1.5f;
-	constexpr GLfloat camera_rotate_speed = 10.f;
+	constexpr GLfloat camera_rotate_speed = 50.f;
 
 	glm::vec2 cursor_delta = input_state.cursor_delta;
 	cursor_delta *= -1;
@@ -170,6 +170,8 @@ int main()
 	double last_time = glfwGetTime();
 	double delta_time = 0;
 	double time;
+
+	glfwSwapInterval(0);
 	// Loop until window closed
 	while(!window->should_close())
 	{
