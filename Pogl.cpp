@@ -51,37 +51,44 @@ Mesh* create_tetrahedron()
 
 void update_camera(Camera& camera, const Input_state& input_state, const double& delta_time)
 {
+	constexpr GLfloat camera_move_speed = 1.5f;
+	constexpr GLfloat camera_rotate_speed = 10.f;
+
 	glm::vec2 cursor_delta = input_state.cursor_delta;
-	cursor_delta.y *= -1;
-	cursor_delta *= delta_time * to_radians;
+	cursor_delta *= -1;
+	cursor_delta *= delta_time * glm::radians(camera_rotate_speed);
 
 	glm::mat4x4 camera_transform = camera.transform_matrix;
 
-	camera_transform = glm::rotate(camera_transform, cursor_delta.x, glm::vec3(0, 1, 0));
-	camera_transform = glm::rotate(camera_transform, cursor_delta.y, static_cast<glm::vec3>(camera_transform * glm::vec4(0, 0, 1, 0)));
+	// https://gist.github.com/FreyaHolmer/650ecd551562352120445513efa1d952
+	glm::quat rotation{1,0,0,0};
+	glm::quat horiz = glm::rotate(rotation, cursor_delta.x, glm::vec3(0, 1, 0));
+	glm::quat vert = glm::rotate(rotation, cursor_delta.y, glm::vec3(1, 0, 0));
+	rotation = horiz * camera.get_rotation() * vert;
 
-	glm::vec3 translation{0};
+	glm::vec4 translation = glm::vec4{ 0 };
 
 	if(input_state.get_w_pressed())
 	{
-		translation -= glm::vec3(0, 0, 1);
+		translation -= glm::vec4(0, 0, 1,0);
 	}
 	else if(input_state.get_s_pressed())
 	{
-		translation += glm::vec3(0, 0, 1);
+		translation += glm::vec4(0, 0, 1,0);
 	}
 	if(input_state.get_d_pressed())
 	{
-		translation += glm::vec3(1, 0, 0);
+		translation += glm::vec4(1, 0, 0,0);
 	}
 	else if(input_state.get_a_pressed())
 	{
-		translation -= glm::vec3(1, 0, 0);
+		translation -= glm::vec4(1, 0, 0,0);
 	}
-	translation *= 0.5f * static_cast<GLfloat>(delta_time);
-	camera_transform = glm::translate(camera_transform, translation);
-
-	camera.set_transform(camera_transform);
+	glm::vec4 position = camera.get_position();
+	translation *= camera_move_speed * static_cast<GLfloat>(delta_time);
+	camera.set_rotation(rotation);
+	translation = camera_transform * translation;
+	camera.set_position(position+translation);
 }
 
 int main()
@@ -153,11 +160,16 @@ int main()
 	glm::mat4 model_matrix(1.0f);
 	glm::mat4 projection_matrix = glm::perspective(45.0f, (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.f);
 
-	Camera camera = { glm::mat4x4{1} };
+	Camera camera =
+	{
+		glm::vec3(0,0,0),
+		glm::vec3(0,0,-1),
+		glm::vec3(0,1,0)
+	};
 
 	double last_time = glfwGetTime();
-	double time = last_time;
 	double delta_time = 0;
+	double time;
 	// Loop until window closed
 	while(!window->should_close())
 	{
@@ -167,7 +179,7 @@ int main()
 		// Get & handle user events
 		input_state.cursor_delta = glm::vec2{ 0 };
 
-		glfwPollEvents();
+		glfwPollEvents(); // invokes callbacks in PoglWindow
 
 		update_camera(camera, input_state, delta_time);
 
