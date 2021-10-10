@@ -21,14 +21,15 @@ public:
 	void clear_shader();
 
 	const GLuint& id = _id;
-	const GLint& uniform_projection = _uniform_projection;
-	const GLint& uniform_model = _uniform_model;
+	const GLint& uniform_projection = projection;
+	const GLint& uniform_model = model;
+	const GLint& uniform_view = view;
 
 	~Shader();
 
 private:
 	GLuint _id;
-	GLint _uniform_projection, _uniform_model;
+	GLint projection, model, view;
 	static void compile_and_add_shader(GLuint shader_id, const char* shader_code, GLenum shader_type);
 	int read_file(const char* file_path, std::string* content) const;
 };

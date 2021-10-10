@@ -1,7 +1,5 @@
 #include "Mesh.h"
 
-#include <cstdlib>
-
 Mesh::Mesh()
 {
 	vao = 0;
@@ -13,7 +11,7 @@ Mesh::Mesh()
 
 void Mesh::create_mesh
 (
-	const GLfloat* vertices, const GLfloat* colors, const unsigned int* indices, 
+	const GLfloat* vertices, const GLfloat* colors, const unsigned int* indices,
 	const GLsizei vertex_count, const GLsizei index_count
 )
 {
@@ -56,7 +54,6 @@ void Mesh::create_mesh
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
 	glBindVertexArray(0);
-	auto error = glGetError();
 }
 
 void Mesh::render_mesh() const

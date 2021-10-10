@@ -3,8 +3,9 @@
 Shader::Shader()
 {
 	_id = 0;
-	_uniform_model = 0;
-	_uniform_projection = 0;
+	model = 0;
+	projection = 0;
+	view = 0;
 }
 
 void Shader::create_from_string(const char* vertex_code, const char* fragment_code)
@@ -36,8 +37,9 @@ void Shader::create_from_string(const char* vertex_code, const char* fragment_co
 		glGetProgramInfoLog(id, sizeof(error_log), nullptr, error_log);
 		fprintf(stderr, "Error validating program : '%s'\n", error_log);
 	}
-	_uniform_model = glGetUniformLocation(id, "model_matrix");
-	_uniform_projection = glGetUniformLocation(id, "projection_matrix");
+	model = glGetUniformLocation(id, "model_matrix");
+	projection = glGetUniformLocation(id, "projection_matrix");
+	view = glGetUniformLocation(id, "view_matrix");
 }
 
 void Shader::create_from_files(const char* vertex_path, const char* fragment_path)
@@ -114,8 +116,9 @@ void Shader::clear_shader()
 		glDeleteProgram(id);
 		_id = 0;
 	}
-	_uniform_model = 0;
-	_uniform_projection = 0;
+	model = 0;
+	projection = 0;
+	view = 0;
 }
 
 Shader::~Shader()

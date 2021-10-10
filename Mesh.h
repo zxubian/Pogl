@@ -1,6 +1,7 @@
 #pragma once
 
 #include <gl/glew.h>
+#include <cstdlib>
 
 class Mesh
 {
