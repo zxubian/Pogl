@@ -11,8 +11,8 @@ constexpr float tri_angle_increment = 0.005f;
 float current_angle = 0.f;
 float current_scale = 1.f;
 
-const char* vertex_shader_path = "../../../Shaders/shader.vert";
-const char* fragment_shader_path = "../../../Shaders/shader.frag";
+const char* vertex_shader_path = "../../../src/shaders/shader.vert";
+const char* fragment_shader_path = "../../../src/shaders/shader.frag";
 
 // Fragment Shader:
 
