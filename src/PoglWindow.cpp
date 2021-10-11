@@ -1,4 +1,4 @@
-#include "PoglWindow.h"
+#include "../include/PoglWindow.h"
 
 Pogl_window::Pogl_window(int window_width, int window_height, Input_state& input):input_state(input)
 {

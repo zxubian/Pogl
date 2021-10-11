@@ -1,4 +1,4 @@
-﻿#include "Pogl.h"
+﻿#include "../include/Pogl.h"
 
 // Window Dimensions
 constexpr GLint window_width = 800, window_height = 600;
@@ -11,20 +11,13 @@ constexpr float tri_angle_increment = 0.005f;
 float current_angle = 0.f;
 float current_scale = 1.f;
 
-const char* vertex_shader_path = "../../../src/shaders/shader.vert";
-const char* fragment_shader_path = "../../../src/shaders/shader.frag";
+const char* vertex_shader_path = "../../../data/shaders/shader.vert";
+const char* fragment_shader_path = "../../../data/shaders/shader.frag";
 
 // Fragment Shader:
 
 Mesh* create_tetrahedron()
 {
-	const glm::uint indicies[] = {
-		0,3,1,
-		1,3,2,
-		2,3,0,
-		0,1,2
-	};
-
 	const auto cos_theta = cos(120.f * to_radians);
 	const auto sin_theta = sin(120.f * to_radians);
 
@@ -36,16 +29,31 @@ Mesh* create_tetrahedron()
 		0.f,sqrt(2.f),0.f
 	};
 
-	GLfloat colors[] =
+	const glm::uint indicies[] = {
+		0,3,1,
+		1,3,2,
+		2,3,0,
+		0,1,2
+	};
+
+	unsigned short texcoord_0[] =
 	{
-		1.0f,0.f,0.f,1.f,
-		0.0f,1.f,0.f,1.f,
-		0.0f,0.f,1.f,1.f,
-		1.0f,1.f,0.f,1.f
+		0,0,
+		0,1,
+		1,0,
+		1,1
+	};
+
+	unsigned char colors[] =
+	{
+		255,0,0,0,
+		0,255,0,255,
+		0,0,255,255,
+		255,255,0,255
 	};
 
 	const auto tetrahedron = new Mesh();
-	tetrahedron->create_mesh(vertices, colors, indicies, 12, 12);
+	tetrahedron->create_mesh(vertices, colors, indicies, texcoord_0, 12, 12);
 	return tetrahedron;
 }
 
@@ -89,6 +97,12 @@ void update_camera(Camera& camera, const Input_state& input_state, const double&
 	camera.set_rotation(rotation);
 	translation = camera_transform * translation;
 	camera.set_position(position+translation);
+}
+
+inline void use_texture(const Texture* texture)
+{
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture->id);
 }
 
 int main()

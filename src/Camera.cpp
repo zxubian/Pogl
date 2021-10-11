@@ -1,4 +1,4 @@
-#include "Camera.h"
+#include "../include/Camera.h"
 
 Camera::Camera(const glm::vec3 position, const glm::vec3 forward, const glm::vec3 up)
 {
