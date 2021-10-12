@@ -13,7 +13,7 @@ float current_scale = 1.f;
 
 const char* vertex_shader_path = "../../../data/shaders/shader.vert";
 const char* fragment_shader_path = "../../../data/shaders/shader.frag";
-const char* texture_path = "../../../data/textures/uv_checker.frag";
+const char* texture_path = "../../../data/textures/uv_checker.png";
 
 // Fragment Shader:
 
@@ -32,7 +32,7 @@ Mesh* create_tetrahedron()
 
 	const glm::uint indicies[] = {
 		0,3,1,
-		1,3,2,
+		2,1,3,
 		2,3,0,
 		0,1,2
 	};
@@ -40,9 +40,9 @@ Mesh* create_tetrahedron()
 	unsigned short texcoord_0[] =
 	{
 		0,0,
-		0,1,
 		1,0,
-		1,1
+		0.5,0,
+		0.5,1
 	};
 
 	unsigned char colors[] =
@@ -203,10 +203,10 @@ int main()
 		glm::vec3 offset = glm::vec3{2, 0, 0};
 		glm::float32 i = 0;
 
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture->id);
 		for (const auto mesh : meshes)
 		{
-			glActiveTexture(GL_TEXTURE0);
-			glBindTexture(GL_TEXTURE_2D, texture->id);
 			model_matrix = glm::mat4(1.0f);
 			model_matrix = glm::translate(model_matrix,glm::vec3(0, 0, 5) + (offset * i));
 			model_matrix = glm::scale(model_matrix, glm::vec3(current_scale, current_scale, current_scale));
@@ -219,6 +219,7 @@ int main()
 		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
+		glActiveTexture(0);
 
 		glUseProgram(0);
 

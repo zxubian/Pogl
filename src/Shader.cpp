@@ -40,6 +40,7 @@ void Shader::create_from_string(const char* vertex_code, const char* fragment_co
 	model = glGetUniformLocation(id, "model_matrix");
 	projection = glGetUniformLocation(id, "projection_matrix");
 	view = glGetUniformLocation(id, "view_matrix");
+	main_tex = glGetUniformLocation(id, "main_tex");
 }
 
 void Shader::create_from_files(const char* vertex_path, const char* fragment_path)

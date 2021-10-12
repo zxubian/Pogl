@@ -56,7 +56,7 @@ void Mesh::create_mesh
 			glBindBuffer(GL_ARRAY_BUFFER, vbos[vbo_index]);
 			{
 				glBufferData(GL_ARRAY_BUFFER, vertex_count * 2 * sizeof tex_coords[0], tex_coords, GL_STATIC_DRAW);
-				glVertexAttribPointer(1, 2, GL_UNSIGNED_SHORT, GL_TRUE, 0, nullptr);
+				glVertexAttribPointer(1, 2, GL_UNSIGNED_SHORT, GL_FALSE, 0, nullptr);
 				glEnableVertexAttribArray(1);
 			}
 			glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -82,7 +82,6 @@ void Mesh::create_mesh
 		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-
 
 	glBindVertexArray(0);
 }

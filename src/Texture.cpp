@@ -21,7 +21,7 @@ Texture::Texture(const char* file_path)
 
 bool Texture::load_texture()
 {
-	unsigned char* texture_data = stbi_load(file_path, &height, &width, &bit_depth, 0);
+	unsigned char* texture_data = stbi_load(file_path, &width, &height, &bit_depth, 0);
 	if(texture_data == nullptr)
 	{
 		std::cerr << "Failed to open texture " << file_path << "\n";
@@ -34,13 +34,13 @@ bool Texture::load_texture()
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, texture_data);
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, texture_data);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	glBindTexture(GL_TEXTURE_2D, 0);
 	stbi_image_free(texture_data);
 	const GLenum success= glGetError();
-	if(!success)
+	if(!success == GL_NO_ERROR)
 	{
 		std::cerr << "Error when importing texture " << file_path << " " << glewGetErrorString(success) << "\n";
 		return false;

@@ -24,12 +24,13 @@ public:
 	const GLint& uniform_projection = projection;
 	const GLint& uniform_model = model;
 	const GLint& uniform_view = view;
+	const GLint& uniform_main_tex = main_tex;
 
 	~Shader();
 
 private:
 	GLuint _id;
-	GLint projection, model, view;
+	GLint projection, model, view, main_tex;
 	static void compile_and_add_shader(GLuint shader_id, const char* shader_code, GLenum shader_type);
 	int read_file(const char* file_path, std::string* content) const;
 };

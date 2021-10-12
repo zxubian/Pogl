@@ -13,7 +13,7 @@ public:
 	(
 		const GLfloat* vertices, const unsigned char* colors, const unsigned int* indices,
 		const unsigned short* tex_coords,
-		const GLsizei vertex_count, const GLsizei index_count
+		GLsizei vertex_count, GLsizei index_count
 	);
 
 	void render_mesh() const;
