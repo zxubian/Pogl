@@ -219,7 +219,6 @@ int main()
 		}
 
 		glBindTexture(GL_TEXTURE_2D, 0);
-		glActiveTexture(0);
 
 		glUseProgram(0);
 
