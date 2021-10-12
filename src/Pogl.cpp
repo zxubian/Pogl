@@ -13,6 +13,7 @@ float current_scale = 1.f;
 
 const char* vertex_shader_path = "../../../data/shaders/shader.vert";
 const char* fragment_shader_path = "../../../data/shaders/shader.frag";
+const char* texture_path = "../../../data/textures/uv_checker.frag";
 
 // Fragment Shader:
 
@@ -63,26 +64,23 @@ void update_camera(Camera& camera, const Input_state& input_state, const double&
 	constexpr GLfloat camera_rotate_speed = 50.f;
 
 	glm::vec2 cursor_delta = input_state.cursor_delta;
-	cursor_delta *= -1;
+	cursor_delta.y *= -1;
 	cursor_delta *= delta_time * glm::radians(camera_rotate_speed);
 
-	glm::mat4x4 camera_transform = camera.transform_matrix;
-
 	// https://gist.github.com/FreyaHolmer/650ecd551562352120445513efa1d952
-	glm::quat rotation{1,0,0,0};
-	glm::quat horiz = glm::rotate(rotation, cursor_delta.x, glm::vec3(0, 1, 0));
-	glm::quat vert = glm::rotate(rotation, cursor_delta.y, glm::vec3(1, 0, 0));
-	rotation = horiz * camera.get_rotation() * vert;
+
+	camera.yaw += cursor_delta.x;
+	camera.pitch += cursor_delta.y;
 
 	glm::vec4 translation = glm::vec4{ 0 };
 
 	if(input_state.get_w_pressed())
 	{
-		translation -= glm::vec4(0, 0, 1,0);
+		translation += glm::vec4(0, 0, 1,0);
 	}
 	else if(input_state.get_s_pressed())
 	{
-		translation += glm::vec4(0, 0, 1,0);
+		translation -= glm::vec4(0, 0, 1,0);
 	}
 	if(input_state.get_d_pressed())
 	{
@@ -92,17 +90,10 @@ void update_camera(Camera& camera, const Input_state& input_state, const double&
 	{
 		translation -= glm::vec4(1, 0, 0,0);
 	}
-	glm::vec4 position = camera.get_position();
 	translation *= camera_move_speed * static_cast<GLfloat>(delta_time);
-	camera.set_rotation(rotation);
-	translation = camera_transform * translation;
-	camera.set_position(position+translation);
-}
-
-inline void use_texture(const Texture* texture)
-{
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture->id);
+	translation = camera.transform_matrix* translation;
+	camera.position += static_cast<glm::vec3>(translation);
+	camera.recalculate_matricies();
 }
 
 int main()
@@ -171,13 +162,17 @@ int main()
 	Shader shader = Shader();
 	shader.create_from_files(vertex_shader_path, fragment_shader_path);
 
+	Texture* texture = new Texture(texture_path);
+
+	texture->load_texture();
+
 	glm::mat4 model_matrix(1.0f);
 	glm::mat4 projection_matrix = glm::perspective(45.0f, (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.f);
 
 	Camera camera =
 	{
 		glm::vec3(0,0,0),
-		glm::vec3(0,0,-1),
+		glm::vec3(0,0,1),
 		glm::vec3(0,1,0)
 	};
 
@@ -210,8 +205,10 @@ int main()
 
 		for (const auto mesh : meshes)
 		{
+			glActiveTexture(GL_TEXTURE0);
+			glBindTexture(GL_TEXTURE_2D, texture->id);
 			model_matrix = glm::mat4(1.0f);
-			model_matrix = glm::translate(model_matrix,glm::vec3(-1, 0, -5) + (offset * i));
+			model_matrix = glm::translate(model_matrix,glm::vec3(0, 0, 5) + (offset * i));
 			model_matrix = glm::scale(model_matrix, glm::vec3(current_scale, current_scale, current_scale));
 			model_matrix = glm::rotate(model_matrix, current_angle * to_radians, glm::vec3(0, 1, 0));
 			glUniformMatrix4fv(shader.uniform_model, 1, GL_FALSE, glm::value_ptr(model_matrix));
@@ -220,6 +217,8 @@ int main()
 			mesh -> render_mesh();
 			i += 1;
 		}
+
+		glBindTexture(GL_TEXTURE_2D, 0);
 
 		glUseProgram(0);
 
