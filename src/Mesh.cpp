@@ -5,21 +5,20 @@ Mesh::Mesh()
 	vao = 0;
 	ibo = 0;
 	index_count = 0;
-	vbos = nullptr;
+	vbo = 0;
 	has_colors = false;
 	has_texcoords = false;
 }
 
 void Mesh::create_mesh
 (
-	const GLfloat* vertices, const unsigned char* colors, const unsigned int* indices,
-	const unsigned short* tex_coords,
+	const GLfloat* vertices, 
+	const GLfloat* tex_coords,
+	const unsigned char* colors, 
+	const unsigned int* indices,
 	const GLsizei vertex_count, const GLsizei index_count
 )
 {
-	//TODO: @performance merge attributes into single vbo
-	// https://www.khronos.org/opengl/wiki/Vertex_Specification_Best_Practices 
-
 	this->index_count = index_count;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
@@ -27,54 +26,28 @@ void Mesh::create_mesh
 		has_colors = colors != nullptr;
 		has_texcoords = tex_coords != nullptr;
 
-		GLsizei vbo_count = 1;
-		if (has_colors)
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		{
-			vbo_count++;
-		}
-		if (has_texcoords)
-		{
-			vbo_count++;
-		}
-		vbos = static_cast<GLuint*>(malloc(sizeof(GLuint) * vbo_count));
-		if (vbos == nullptr)
-		{
-			std::cerr << "Failed to allocate space for vbos.";
-			return;
-		}
-		glGenBuffers(vbo_count, vbos);
-		GLsizei vbo_index = 0;
-		glBindBuffer(GL_ARRAY_BUFFER, vbos[vbo_index]);
-		{
-			glBufferData(GL_ARRAY_BUFFER, vertex_count * sizeof vertices[0], vertices, GL_STATIC_DRAW);
-			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, nullptr);
-			glEnableVertexAttribArray(0);
-		}
-		vbo_index++;
-		if (has_texcoords)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbos[vbo_index]);
-			{
-				glBufferData(GL_ARRAY_BUFFER, vertex_count * 2 * sizeof tex_coords[0], tex_coords, GL_STATIC_DRAW);
-				glVertexAttribPointer(1, 2, GL_UNSIGNED_SHORT, GL_FALSE, 0, nullptr);
-				glEnableVertexAttribArray(1);
-			}
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			vbo_index++;
-		}
+			GLintptr vertex_size = vertex_count * 3 * sizeof(vertices[0]);
+			GLintptr texcoord_size = vertex_count * 2 * sizeof(tex_coords[0]);
+			GLintptr color_size = vertex_count * 4 * sizeof(colors[0]);
+			glBufferData(GL_ARRAY_BUFFER, vertex_count*(vertex_size + texcoord_size + color_size), nullptr, GL_STATIC_DRAW);
 
-		if (has_colors)
-		{
-			glBindBuffer(GL_ARRAY_BUFFER, vbo_index);
-			{
-				glBufferData(GL_ARRAY_BUFFER, vertex_count * 4 * sizeof(colors[1]), colors, GL_STATIC_DRAW);
-				glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, nullptr);
-				glEnableVertexAttribArray(2);
-			}
-			glBindBuffer(GL_ARRAY_BUFFER, 0);
-			vbo_index++;
+			// Merge attributes into single vbo
+			// https://www.khronos.org/opengl/wiki/Vertex_Specification_Best_Practices 
+			// https://www.haroldserrano.com/blog/loading-vertex-normal-and-uv-data-onto-opengl-buffers	
+
+			glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_size, vertices);
+			glBufferSubData(GL_ARRAY_BUFFER, vertex_size, texcoord_size, tex_coords);
+			glBufferSubData(GL_ARRAY_BUFFER, vertex_size + texcoord_size, color_size, colors);
+			glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(0));
+			glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (const GLvoid*)(vertex_size));
+			glVertexAttribPointer(2, 4, GL_UNSIGNED_BYTE, GL_TRUE, 0, (const GLvoid*)(vertex_size + texcoord_size));
+			glEnableVertexAttribArray(0);
+			glEnableVertexAttribArray(1);
+			glEnableVertexAttribArray(2);
 		}
-		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glGenBuffers(1, &ibo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 		{
@@ -102,12 +75,10 @@ void Mesh::clear_mesh()
 		glDeleteBuffers(1, &ibo);
 		ibo = 0;
 	}
-	if (vbos != nullptr)
+	if(vbo != 0)
 	{
-		auto buffer_count = has_colors ? 2 : 1;
-		glDeleteBuffers(buffer_count, vbos);
-		free(vbos);
-		vbos = nullptr;
+		glDeleteBuffers(1, &vbo);
+		vbo = 0;
 	}
 	if (vao != 0)
 	{

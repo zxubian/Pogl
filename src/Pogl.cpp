@@ -30,22 +30,22 @@ Mesh* create_tetrahedron()
 		0.f,sqrt(2.f),0.f
 	};
 
-	const glm::uint indicies[] = {
+	constexpr glm::uint indicies[] = {
 		0,3,1,
 		2,1,3,
 		2,3,0,
 		0,1,2
 	};
 
-	unsigned short texcoord_0[] =
+	constexpr GLfloat texcoord_0[] =
 	{
-		0,0,
-		1,0,
-		0.5,0,
-		0.5,1
+		0.f,0.f,
+		1.f,0.f,
+		0.5f,0.f,
+		0.5f,1.f
 	};
 
-	unsigned char colors[] =
+	constexpr unsigned char colors[] =
 	{
 		255,0,0,0,
 		0,255,0,255,
@@ -54,7 +54,7 @@ Mesh* create_tetrahedron()
 	};
 
 	const auto tetrahedron = new Mesh();
-	tetrahedron->create_mesh(vertices, colors, indicies, texcoord_0, 12, 12);
+	tetrahedron->create_mesh(vertices, texcoord_0, colors, indicies, 4, 12);
 	return tetrahedron;
 }
 
