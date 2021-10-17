@@ -5,7 +5,7 @@
 #include <iostream>
 #include <fstream>
 
-#include <GL\glew.h>
+#include <gl/glew.h>
 
 class Shader
 {
@@ -21,10 +21,6 @@ public:
 	void clear_shader();
 
 	const GLuint& id = _id;
-	const GLint& uniform_projection = projection;
-	const GLint& uniform_model = model;
-	const GLint& uniform_view = view;
-	const GLint& uniform_main_tex = main_tex;
 
 	~Shader();
 

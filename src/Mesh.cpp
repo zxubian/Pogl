@@ -59,15 +59,6 @@ void Mesh::create_mesh
 	glBindVertexArray(0);
 }
 
-void Mesh::render_mesh() const
-{
-	glBindVertexArray(vao);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
-	glDrawElements(GL_TRIANGLES, index_count, GL_UNSIGNED_INT, nullptr);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindVertexArray(0);
-}
-
 void Mesh::clear_mesh()
 {
 	if (ibo != 0)

@@ -4,7 +4,7 @@ file(GLOB SHADERS "../data/shaders/*.vert" "../data/shaders/*.frag" )
 source_group("Shaders" FILES ${SHADERS})
 
 # Add source to this project's executable.
-add_executable (${PROJECT_NAME} ${SOURCE_LIST} ${HEADER_LIST} ${SHADERS})
+add_executable (${PROJECT_NAME} ${SOURCE_LIST} ${HEADER_LIST} ${SHADERS} )
 
 find_package(OpenGL REQUIRED)
 find_package(glfw3 REQUIRED) # First try to find using the find_package method (works with vcpkg)

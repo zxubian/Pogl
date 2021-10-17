@@ -1,5 +1,16 @@
 ﻿#include "../include/Pogl.h"
 
+#include <gl/glew.h>
+#include <GLFW/glfw3.h>
+
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+#include <iostream>
+#include <vector>
+
 // Window Dimensions
 constexpr GLint window_width = 800, window_height = 600;
 
@@ -167,6 +178,7 @@ int main()
 	texture->load_texture();
 
 	glm::mat4 model_matrix(1.0f);
+	glm::mat4 model_view_matrix, model_view_inv_trans_matrix;
 	glm::mat4 projection_matrix = glm::perspective(45.0f, (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.f);
 
 	Camera camera =
@@ -194,6 +206,8 @@ int main()
 
 		update_camera(camera, input_state, delta_time);
 
+		render()
+
 		// Clear window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -211,9 +225,8 @@ int main()
 			model_matrix = glm::translate(model_matrix,glm::vec3(0, 0, 5) + (offset * i));
 			model_matrix = glm::scale(model_matrix, glm::vec3(current_scale, current_scale, current_scale));
 			model_matrix = glm::rotate(model_matrix, current_angle * to_radians, glm::vec3(0, 1, 0));
-			glUniformMatrix4fv(shader.uniform_model, 1, GL_FALSE, glm::value_ptr(model_matrix));
-			glUniformMatrix4fv(shader.uniform_view, 1, GL_FALSE, glm::value_ptr(camera.view_matrix));
-			glUniformMatrix4fv(shader.uniform_projection, 1, GL_FALSE, glm::value_ptr(projection_matrix));
+			model_view_matrix
+			model_view_inv_trans_matrix = 
 			mesh -> render_mesh();
 			i += 1;
 		}
