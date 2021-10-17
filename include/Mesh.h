@@ -20,10 +20,9 @@ public:
 
 	void render_mesh() const;
 	void clear_mesh();
-
-	~Mesh();
-private:
 	GLuint vao, vbo, ibo;
 	GLsizei index_count;
 	bool has_colors, has_texcoords;
+
+	~Mesh();
 };
