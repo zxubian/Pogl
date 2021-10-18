@@ -12,9 +12,9 @@ Mesh::Mesh()
 
 void Mesh::create_mesh
 (
-	const GLfloat* vertices, 
+	const GLfloat* vertices,
 	const GLfloat* tex_coords,
-	const unsigned char* colors, 
+	const unsigned char* colors,
 	const unsigned int* indices,
 	const GLsizei vertex_count, const GLsizei index_count
 )
@@ -35,8 +35,8 @@ void Mesh::create_mesh
 			glBufferData(GL_ARRAY_BUFFER, vertex_count*(vertex_size + texcoord_size + color_size), nullptr, GL_STATIC_DRAW);
 
 			// Merge attributes into single vbo
-			// https://www.khronos.org/opengl/wiki/Vertex_Specification_Best_Practices 
-			// https://www.haroldserrano.com/blog/loading-vertex-normal-and-uv-data-onto-opengl-buffers	
+			// https://www.khronos.org/opengl/wiki/Vertex_Specification_Best_Practices
+			// https://www.haroldserrano.com/blog/loading-vertex-normal-and-uv-data-onto-opengl-buffers
 
 			glBufferSubData(GL_ARRAY_BUFFER, 0, vertex_size, vertices);
 			glBufferSubData(GL_ARRAY_BUFFER, vertex_size, texcoord_size, tex_coords);
@@ -55,7 +55,6 @@ void Mesh::create_mesh
 		}
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	}
-
 	glBindVertexArray(0);
 }
 

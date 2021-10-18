@@ -6,7 +6,6 @@
 
 #include "Mesh.h"
 #include "Transform.h"
-#include "Vertex_Col.h"
 
 struct Program_render_data
 {

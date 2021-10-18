@@ -9,12 +9,18 @@ enum shader_type
 	specular_diffuse
 };
 
-inline GLuint get_uniform_count(shader_type type)
+inline void get_uniforms_vertex_col(GLuint id, GLint* uniforms)
+{
+	uniforms[0] = glGetUniformLocation(id, "vp_matrix");
+	uniforms[1] = glGetUniformLocation(id, "model_matrix");
+}
+
+constexpr GLuint get_uniform_count(const shader_type type)
 {
 	switch (type)
 	{
 	case vertex_col:
-		return 1;
+		return 2;
 	case specular_diffuse:
 		return -1;
 	default:

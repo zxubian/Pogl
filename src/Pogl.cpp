@@ -1,15 +1,5 @@
 ﻿#include "../include/Pogl.h"
 
-#include <gl/glew.h>
-#include <GLFW/glfw3.h>
-
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <glm/gtc/quaternion.hpp>
-#include <glm/gtx/quaternion.hpp>
-
-#include <iostream>
-#include <vector>
 
 // Window Dimensions
 constexpr GLint window_width = 800, window_height = 600;
@@ -22,8 +12,8 @@ constexpr float tri_angle_increment = 0.005f;
 float current_angle = 0.f;
 float current_scale = 1.f;
 
-const char* vertex_shader_path = "../../../data/shaders/shader.vert";
-const char* fragment_shader_path = "../../../data/shaders/shader.frag";
+const char* vertex_col_vert_path = "../../../data/shaders/vertex_col.vert";
+const char* vertex_col_frag_path = "../../../data/shaders/vertex_col.frag";
 const char* texture_path = "../../../data/textures/uv_checker.png";
 
 // Fragment Shader:
@@ -167,19 +157,8 @@ int main()
 	//Setup viewport size
 	glViewport(0, 0, buffer_width, buffer_height);
 
-	std::vector<Mesh*> meshes = std::vector<Mesh*>();
-	meshes.push_back(create_tetrahedron());
-	meshes.push_back(create_tetrahedron());
-	Shader shader = Shader();
-	shader.create_from_files(vertex_shader_path, fragment_shader_path);
-
-	Texture* texture = new Texture(texture_path);
-
-	texture->load_texture();
-
-	glm::mat4 model_matrix(1.0f);
-	glm::mat4 model_view_matrix, model_view_inv_trans_matrix;
-	glm::mat4 projection_matrix = glm::perspective(45.0f, (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.f);
+	Shader vertex_col_shader = Shader();
+	vertex_col_shader.create_from_files(vertex_col_vert_path, vertex_col_frag_path);
 
 	Camera camera =
 	{
@@ -193,6 +172,47 @@ int main()
 	double time;
 
 	glfwSwapInterval(0);
+
+	GLint vertex_col_uniforms[get_uniform_count(vertex_col)];
+
+	get_uniforms_vertex_col(vertex_col_shader.id, vertex_col_uniforms);
+
+	Program_render_data program_render_data
+	{
+		vertex_col_shader.id,
+		vertex_col_uniforms
+	};
+
+	Per_frame_render_data per_frame_render_data
+	{
+		glm::perspective(45.0f, (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.f),
+		camera.view_matrix
+	};
+
+	Transform vertex_col_transforms[2] =
+	{
+		Transform { glm::mat4x4{1}, },
+		Transform { glm::translate(glm::mat4x4{1}, glm::vec3(0,0,1)), }
+	};
+
+	Mesh_render_data vertex_col_mesh
+	{
+		create_tetrahedron(),
+		vertex_col_transforms,
+		2
+	};
+
+	Vertex_col_data vertex_col
+	{
+		&vertex_col_mesh,
+		1
+	};
+
+	Things_to_render things_to_render
+	{
+		vertex_col
+	};
+
 	// Loop until window closed
 	while(!window->should_close())
 	{
@@ -206,37 +226,15 @@ int main()
 
 		update_camera(camera, input_state, delta_time);
 
-		render()
+		per_frame_render_data.view_matrix = camera.view_matrix;
 
 		// Clear window
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		glUseProgram(shader.id);
-
-		glm::vec3 offset = glm::vec3{2, 0, 0};
-		glm::float32 i = 0;
-
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture->id);
-		for (const auto mesh : meshes)
-		{
-			model_matrix = glm::mat4(1.0f);
-			model_matrix = glm::translate(model_matrix,glm::vec3(0, 0, 5) + (offset * i));
-			model_matrix = glm::scale(model_matrix, glm::vec3(current_scale, current_scale, current_scale));
-			model_matrix = glm::rotate(model_matrix, current_angle * to_radians, glm::vec3(0, 1, 0));
-			model_view_matrix
-			model_view_inv_trans_matrix = 
-			mesh -> render_mesh();
-			i += 1;
-		}
-
-		glBindTexture(GL_TEXTURE_2D, 0);
-
-		glUseProgram(0);
+		render(&program_render_data, &per_frame_render_data, &things_to_render);
 
 		glfwSwapBuffers(window->handle);
 	}
-
 	return 0;
 }
