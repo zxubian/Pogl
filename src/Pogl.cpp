@@ -228,6 +228,9 @@ int main()
 
 	Mesh* tetrahedron = create_tetrahedron();
 
+	Texture* texture = new Texture(texture_path);
+	texture->load_texture();
+
 	Mesh_render_data vertex_col_mesh
 	{
 		tetrahedron,
@@ -250,9 +253,25 @@ int main()
 		glm::vec4(1,1,1,3)
 	};
 
+	Specular_diffuse_instance_render_data instance1_data
+	{
+		texture
+	};
+
+	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
+	{
+		instance1_data
+	};
+
+	Specular_diffuse_instance_render_data** specular_diffuse_instance_data = new Specular_diffuse_instance_render_data*[1]
+	{
+		tetrahedron_data
+	};
+
 	Specular_diffuse_data specular_diffuse
 	{
 		&specular_diffuse_mesh,
+		specular_diffuse_instance_data,
 		1,
 		light_data
 	};
@@ -292,5 +311,8 @@ int main()
 
 		glfwSwapBuffers(window->handle);
 	}
+
+	delete[] tetrahedron_data;
+	delete[] specular_diffuse_instance_data;
 	return 0;
 }

@@ -13,7 +13,7 @@ uniform vec4 light_color;
 uniform vec4 specular_color;
 uniform vec3 light_direction;
 uniform vec3 camera_world_pos;
-uniform sampler2D main_tex;
+uniform sampler2D albedo_tex;
 
 vec3 diffuse(vec3 normal, vec3 light_direction)
 {
@@ -29,10 +29,10 @@ vec3 specular(vec3 normal, vec3 halfway, float specular_power, float nl)
 
 void main()
 {
-	vec4 albedo = texture(main_tex, texcoord_0);
+	vec4 albedo = texture(albedo_tex, texcoord_0);
 	vec3 view = normalize(camera_world_pos - world_pos.xyz);
 	vec3 halfway = normalize(light_direction + view);
-	albedo.rgb *= diffuse(normal, light_direction) 
+	albedo.rgb *= diffuse(normal, light_direction)
 	* specular(normal, halfway, specular_color.w, dot(normal, light_direction));
 	color = albedo;
 }
