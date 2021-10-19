@@ -14,6 +14,8 @@ float current_scale = 1.f;
 
 const char* vertex_col_vert_path = "../../../data/shaders/vertex_col.vert";
 const char* vertex_col_frag_path = "../../../data/shaders/vertex_col.frag";
+const char* specular_diffuse_vert_path = "../../../data/shaders/specular_diffuse.vert";
+const char* specular_diffuse_frag_path = "../../../data/shaders/specular_diffuse.frag";
 const char* texture_path = "../../../data/textures/uv_checker.png";
 
 // Fragment Shader:
@@ -23,19 +25,12 @@ Mesh* create_tetrahedron()
 	const auto cos_theta = cos(120.f * to_radians);
 	const auto sin_theta = sin(120.f * to_radians);
 
-	const GLfloat vertices[] =
+	GLfloat vertices[] =
 	{
 		1.0f,0.f,0.f,
 		cos_theta, 0,sin_theta,
 		cos_theta, 0,-sin_theta,
 		0.f,sqrt(2.f),0.f
-	};
-
-	constexpr glm::uint indicies[] = {
-		0,3,1,
-		2,1,3,
-		2,3,0,
-		0,1,2
 	};
 
 	constexpr GLfloat texcoord_0[] =
@@ -48,14 +43,33 @@ Mesh* create_tetrahedron()
 
 	constexpr unsigned char colors[] =
 	{
-		255,0,0,0,
+		255,0,0,255,
 		0,255,0,255,
 		0,0,255,255,
 		255,255,0,255
 	};
 
+	GLuint index_count = 12;
+	GLuint vertex_count = 4;
+
+	constexpr glm::uint indices[] = {
+		0,3,1,
+		2,1,3,
+		2,3,0,
+		0,1,2
+	};
+
+	glm::vec3* normals = new glm::vec3[index_count];
+
+	for(GLuint i = 0; i < index_count; ++i)
+	{
+		normals[i] = glm::vec3{ 0 };
+	}
+
+	generate_normals(reinterpret_cast<glm::vec3*>(vertices), indices, vertex_count, index_count, normals);
 	const auto tetrahedron = new Mesh();
-	tetrahedron->create_mesh(vertices, texcoord_0, colors, indicies, 4, 12);
+	tetrahedron->create_mesh(vertices, texcoord_0, reinterpret_cast<GLfloat*>(normals), colors, indices, 4, 12);
+	delete[](normals);
 	return tetrahedron;
 }
 
@@ -160,6 +174,9 @@ int main()
 	Shader vertex_col_shader = Shader();
 	vertex_col_shader.create_from_files(vertex_col_vert_path, vertex_col_frag_path);
 
+	Shader specular_diffuse_shader = Shader();
+	specular_diffuse_shader.create_from_files(specular_diffuse_vert_path, specular_diffuse_frag_path);
+
 	Camera camera =
 	{
 		glm::vec3(0,0,0),
@@ -173,33 +190,71 @@ int main()
 
 	glfwSwapInterval(0);
 
-	GLint vertex_col_uniforms[get_uniform_count(vertex_col)];
+	GLint vertex_col_uniforms[get_uniform_count(shader_type::vertex_col)];
+	get_uniforms_for_shader(vertex_col_shader.id, vertex_col_uniforms, shader_type::vertex_col);
+	GLint specular_diffuse_uniforms[get_uniform_count(shader_type::specular_diffuse)];
+	get_uniforms_for_shader(specular_diffuse_shader.id, specular_diffuse_uniforms, shader_type::specular_diffuse);
 
-	get_uniforms_vertex_col(vertex_col_shader.id, vertex_col_uniforms);
+	GLint vertex_col_attributes[get_attribute_count(shader_type::vertex_col)];
+	get_attributes_for_shader(vertex_col_shader.id, vertex_col_attributes, shader_type::vertex_col);
+	GLint specular_diffuse_attributes[get_attribute_count(shader_type::specular_diffuse)];
+	get_attributes_for_shader(specular_diffuse_shader.id, specular_diffuse_attributes, shader_type::specular_diffuse);
 
 	Program_render_data program_render_data
 	{
 		vertex_col_shader.id,
-		vertex_col_uniforms
+		vertex_col_uniforms,
+		vertex_col_attributes,
+		specular_diffuse_shader.id,
+		specular_diffuse_uniforms,
+		specular_diffuse_attributes
 	};
 
 	Per_frame_render_data per_frame_render_data
 	{
-		glm::perspective(45.0f, (GLfloat)window_width / (GLfloat)window_height, 0.1f, 100.f),
+		glm::perspective(45.0f, static_cast<GLfloat>(window_width) / static_cast<GLfloat>(window_height), 0.1f, 100.f),
 		camera.view_matrix
 	};
 
-	Transform vertex_col_transforms[2] =
+	Transform vertex_col_transforms[1] =
 	{
-		Transform { glm::mat4x4{1}, },
-		Transform { glm::translate(glm::mat4x4{1}, glm::vec3(0,0,1)), }
+		Transform { glm::translate(glm::mat4x4{1}, glm::vec3(-3,-2,5))},
 	};
+
+	Transform specular_diffuse_transforms[1] =
+	{
+		Transform { glm::translate(glm::mat4x4{1}, glm::vec3(3,-2,5))}
+	};
+
+	Mesh* tetrahedron = create_tetrahedron();
 
 	Mesh_render_data vertex_col_mesh
 	{
-		create_tetrahedron(),
+		tetrahedron,
 		vertex_col_transforms,
-		2
+		1
+	};
+
+	Mesh_render_data specular_diffuse_mesh
+	{
+		tetrahedron,
+		specular_diffuse_transforms,
+		1
+	};
+
+	Light_data light_data
+	{
+		glm::vec4(1,1,1,0.1f),
+		glm::vec3(-0.5, -1, 0),
+		glm::vec4(0,0,1,0.5),
+		glm::vec4(1,1,1,3)
+	};
+
+	Specular_diffuse_data specular_diffuse
+	{
+		&specular_diffuse_mesh,
+		1,
+		light_data
 	};
 
 	Vertex_col_data vertex_col
@@ -210,7 +265,8 @@ int main()
 
 	Things_to_render things_to_render
 	{
-		vertex_col
+		vertex_col,
+		specular_diffuse
 	};
 
 	// Loop until window closed
