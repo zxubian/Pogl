@@ -32,7 +32,7 @@ static constexpr char* const specular_diffuse_uniform_names[] =
 {
 	"model_matrix",
 	"view_matrix",
-	"mv_inv_trans_matrix",
+	"model_inv_trans_matrix",
 	"projection_matrix",
 	"diffuse_color",
 	"ambient_color",

@@ -22,6 +22,7 @@ struct Program_render_data
 struct Specular_diffuse_instance_render_data
 {
 	Texture* texture;
+	glm::vec4 diffuse_color;
 };
 
 struct Mesh_render_data

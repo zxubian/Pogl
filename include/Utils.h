@@ -8,7 +8,7 @@ void generate_normals(const glm::vec3* positions, const GLuint* indicies, GLuint
 	GLuint triangle_count = index_count / 3;
 	GLuint index = 0;
 	GLfloat* per_vertex_averaging_factor = new GLfloat[vertex_count];
-	for(int a = 0; a < vertex_count; ++a)
+	for(GLuint a = 0; a < vertex_count; ++a)
 	{
 		per_vertex_averaging_factor[a] = 0;
 	}

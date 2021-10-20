@@ -59,9 +59,9 @@ Mesh* create_tetrahedron()
 		0,1,2
 	};
 
-	glm::vec3* normals = new glm::vec3[index_count];
+	glm::vec3* normals = new glm::vec3[vertex_count];
 
-	for(GLuint i = 0; i < index_count; ++i)
+	for(GLuint i = 0; i < vertex_count; ++i)
 	{
 		normals[i] = glm::vec3{ 0 };
 	}
@@ -111,6 +111,20 @@ void update_camera(Camera& camera, const Input_state& input_state, const double&
 	camera.recalculate_matricies();
 }
 
+void GLAPIENTRY
+MessageCallback( GLenum source,
+                 GLenum type,
+                 GLuint id,
+                 GLenum severity,
+                 GLsizei length,
+                 const GLchar* message,
+                 const void* userParam )
+{
+  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
+            type, severity, message );
+}
+
 int main()
 {
 	// Init GLFW
@@ -133,6 +147,9 @@ int main()
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 	// Allow Forward compatibility
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
+
+	// During init, enable debug output
 
 	Input_state input_state = {};
 
@@ -161,6 +178,9 @@ int main()
 		glfwTerminate();
 		return 1;
 	}
+
+	glEnable( GL_DEBUG_OUTPUT );
+	glDebugMessageCallback( MessageCallback, 0 );
 
 	// Get Buffer size information
 	int buffer_width, buffer_height;
@@ -210,12 +230,6 @@ int main()
 		specular_diffuse_attributes
 	};
 
-	Per_frame_render_data per_frame_render_data
-	{
-		glm::perspective(45.0f, static_cast<GLfloat>(window_width) / static_cast<GLfloat>(window_height), 0.1f, 100.f),
-		camera.view_matrix
-	};
-
 	Transform vertex_col_transforms[1] =
 	{
 		Transform { glm::translate(glm::mat4x4{1}, glm::vec3(-3,-2,5))},
@@ -248,14 +262,15 @@ int main()
 	Light_data light_data
 	{
 		glm::vec4(1,1,1,0.1f),
-		glm::vec3(-0.5, -1, 0),
-		glm::vec4(0,0,1,0.5),
+		glm::vec3(-0.5, -1, 1),
+		glm::vec4(1,1,1,0.8),
 		glm::vec4(1,1,1,3)
 	};
 
 	Specular_diffuse_instance_render_data instance1_data
 	{
-		texture
+		texture,
+		glm::vec4(1,0,1,1)
 	};
 
 	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
@@ -273,7 +288,6 @@ int main()
 		&specular_diffuse_mesh,
 		specular_diffuse_instance_data,
 		1,
-		light_data
 	};
 
 	Vertex_col_data vertex_col
@@ -287,6 +301,14 @@ int main()
 		vertex_col,
 		specular_diffuse
 	};
+
+	Per_frame_render_data per_frame_render_data
+	{
+		glm::perspective(45.0f, static_cast<GLfloat>(window_width) / static_cast<GLfloat>(window_height), 0.1f, 100.f),
+		camera.view_matrix,
+		light_data
+	};
+
 
 	// Loop until window closed
 	while(!window->should_close())
