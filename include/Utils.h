@@ -35,6 +35,7 @@ void generate_normals(const glm::vec3* positions, const GLuint* indicies, GLuint
 	for(GLuint v = 0; v < vertex_count; ++v)
 	{
 		normals[v] /= per_vertex_averaging_factor[v];
+		normals[v] = glm::normalize(normals[v]);
 	}
 	delete[] per_vertex_averaging_factor;
 }
