@@ -33,10 +33,10 @@ void main()
 	vec4 albedo = texture(albedo_tex, texcoord_0);
 	vec3 view = normalize(camera_world_pos - world_pos.xyz);
 	vec3 l = normalize(light_direction);
-	vec3 halfway = normalize(light_direction + l);
+	vec3 halfway = normalize(view + l);
 	vec3 n = normalize(normal);
 	color.rgb =
 	albedo.rgb * diffuse_color.rgb * diffuse(n, l)
-	+ specular(normal, halfway, specular_power, dot(n, l));
+	+ specular(n, halfway, specular_power, dot(n, l));
 	color.a = albedo.a * diffuse_color.a;
 }
