@@ -63,8 +63,8 @@ void render
 	glUniform4f(uniforms[5], ambient_color.x, ambient_color.y, ambient_color.z, ambient_color.w);
 	const glm::vec4& light_color = light_data.directional_light_color;
 	glUniform4f(uniforms[6], light_color.x, light_color.y, light_color.z, light_color.w);
-	const glm::vec4& specular_color = light_data.specular_color;
-	glUniform4f(uniforms[7], specular_color.x, specular_color.y, specular_color.z, specular_color.w);
+	const glm::vec3& specular_color = light_data.specular_color;
+	glUniform3f(uniforms[7], specular_color.x, specular_color.y, specular_color.z);
 	const glm::vec3& light_direction = light_data.directional_light_dir;
 	glUniform3f(uniforms[8], light_direction.x, light_direction.y, light_direction.z);
 	glUniform3f(uniforms[9], camera_world_pos.x, camera_world_pos.y, camera_world_pos.z);
@@ -93,6 +93,8 @@ void render
 			glUniformMatrix4fv(uniforms[0], 1, GL_FALSE, glm::value_ptr(model_matrix));
 			glUniformMatrix4fv(uniforms[2], 1, GL_FALSE, glm::value_ptr(model_inv_trans));
 			glUniform4f(uniforms[4], diffuse_color.x, diffuse_color.y, diffuse_color.z, diffuse_color.w);
+			const GLfloat& specular_power = per_instance_data.specular_power;
+			glUniform1f(uniforms[10], specular_power);
 			glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, nullptr);
 		}
 		glDisableVertexAttribArray(attributes[0]);

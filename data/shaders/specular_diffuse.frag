@@ -10,9 +10,10 @@ out vec4 color;
 uniform vec4 diffuse_color;
 uniform vec4 ambient_color;
 uniform vec4 light_color;
-uniform vec4 specular_color;
+uniform vec3 specular_color;
 uniform vec3 light_direction;
 uniform vec3 camera_world_pos;
+uniform float specular_power;
 uniform sampler2D albedo_tex;
 
 vec3 diffuse(vec3 normal, vec3 light_direction)
@@ -31,11 +32,11 @@ void main()
 {
 	vec4 albedo = texture(albedo_tex, texcoord_0);
 	vec3 view = normalize(camera_world_pos - world_pos.xyz);
-	vec3 halfway = normalize(light_direction + view);
-	vec3 n = normalize(normal);
 	vec3 l = normalize(light_direction);
+	vec3 halfway = normalize(light_direction + l);
+	vec3 n = normalize(normal);
 	color.rgb =
 	albedo.rgb * diffuse_color.rgb * diffuse(n, l)
-	+ specular(normal, halfway, specular_color.w, dot(n, l));
+	+ specular(normal, halfway, specular_power, dot(n, l));
 	color.a = albedo.a * diffuse_color.a;
 }

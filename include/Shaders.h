@@ -40,6 +40,7 @@ static constexpr char* const specular_diffuse_uniform_names[] =
 	"specular_color",
 	"light_direction",
 	"camera_world_pos",
+	"specular_power",
 	"albedo_tex"
 };
 

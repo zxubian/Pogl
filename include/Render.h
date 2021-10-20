@@ -23,6 +23,7 @@ struct Specular_diffuse_instance_render_data
 {
 	Texture* texture;
 	glm::vec4 diffuse_color;
+	GLfloat specular_power;
 };
 
 struct Mesh_render_data

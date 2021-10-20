@@ -261,16 +261,17 @@ int main()
 
 	Light_data light_data
 	{
-		glm::vec4(1,1,1,0.1f),
+		glm::vec4(1,1,1,0.1),
 		glm::vec3(-0.5, -1, 1),
-		glm::vec4(1,1,1,0.8),
-		glm::vec4(1,1,1,3)
+		glm::vec4(1,1,1,1),
+		glm::vec4(1,1,1,0.91)
 	};
 
 	Specular_diffuse_instance_render_data instance1_data
 	{
 		texture,
-		glm::vec4(1,0,1,1)
+		glm::vec4(1,1,1,1),
+		0.8f
 	};
 
 	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
