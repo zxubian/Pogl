@@ -36,7 +36,7 @@ void main()
 	vec3 halfway = normalize(view + l);
 	vec3 n = normalize(normal);
 	color.rgb =
-	albedo.rgb * diffuse_color.rgb * diffuse(n, l)
-	+ specular(n, halfway, specular_power, dot(n, l));
+	albedo.rgb * (diffuse_color.rgb * diffuse(n, l)
+	+ specular(n, halfway, specular_power, dot(n, l)));
 	color.a = albedo.a * diffuse_color.a;
 }
