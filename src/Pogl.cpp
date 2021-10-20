@@ -271,7 +271,7 @@ int main()
 	{
 		texture,
 		glm::vec4(1,1,1,1),
-		0.8f
+		32
 	};
 
 	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
