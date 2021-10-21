@@ -275,7 +275,6 @@ int main()
 	Light_data light_data
 	{
 		glm::vec4(1,1,1,0.1),
-		glm::vec3(1,1,1),
 		directional_light
 	};
 
@@ -283,6 +282,7 @@ int main()
 	{
 		texture,
 		glm::vec4(1,1,1,1),
+		glm::vec3(1,1,1),
 		64
 	};
 

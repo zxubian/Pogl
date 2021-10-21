@@ -23,6 +23,7 @@ struct Specular_diffuse_instance_render_data
 {
 	Texture* texture;
 	glm::vec4 diffuse_color;
+	glm::vec3 specular_color;
 	GLfloat specular_power;
 };
 
@@ -61,7 +62,6 @@ struct Light_data
 	/// rgb = color, a = intensity
 	/// </summary>
 	glm::vec4 ambient_color;
-	glm::vec3 specular_color;
 	Directional_light directional_light;
 	Point_light* point_lights;
 	GLuint point_light_count;

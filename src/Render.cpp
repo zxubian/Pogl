@@ -64,8 +64,6 @@ void render
 	const Directional_light& directional_light = light_data.directional_light;
 	const glm::vec4& light_color = directional_light.color;
 	glUniform4f(uniforms[6], light_color.x, light_color.y, light_color.z, light_color.w);
-	const glm::vec3& specular_color = light_data.specular_color;
-	glUniform3f(uniforms[7], specular_color.x, specular_color.y, specular_color.z);
 	const glm::vec3& light_direction = directional_light.direction;
 	glUniform3f(uniforms[8], light_direction.x, light_direction.y, light_direction.z);
 	glUniform3f(uniforms[9], camera_world_pos.x, camera_world_pos.y, camera_world_pos.z);
@@ -93,6 +91,8 @@ void render
 			glBindTexture(GL_TEXTURE_2D, per_instance_data.texture->id);
 			glUniformMatrix4fv(uniforms[0], 1, GL_FALSE, glm::value_ptr(model_matrix));
 			glUniformMatrix4fv(uniforms[2], 1, GL_FALSE, glm::value_ptr(model_inv_trans));
+			const glm::vec3& specular_color = per_instance_data.specular_color;
+			glUniform3f(uniforms[7], specular_color.x, specular_color.y, specular_color.z);
 			glUniform4f(uniforms[4], diffuse_color.x, diffuse_color.y, diffuse_color.z, diffuse_color.w);
 			const GLfloat& specular_power = per_instance_data.specular_power;
 			glUniform1f(uniforms[10], specular_power);
