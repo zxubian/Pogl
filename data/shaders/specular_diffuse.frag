@@ -1,9 +1,11 @@
 
 #version 330
 
-in vec2 texcoord_0;
-in vec3 normal;
-in vec4 world_pos;
+in V2F{
+	vec2 texcoord_0;
+	vec3 normal;
+	vec4 world_pos;
+} v2f;
 
 out vec4 color;
 
@@ -30,11 +32,11 @@ vec3 specular(vec3 normal, vec3 halfway, float specular_power, float nl)
 
 void main()
 {
-	vec4 albedo = texture(albedo_tex, texcoord_0);
-	vec3 view = normalize(camera_world_pos - world_pos.xyz);
+	vec4 albedo = texture(albedo_tex, v2f.texcoord_0);
+	vec3 view = normalize(camera_world_pos - v2f.world_pos.xyz);
 	vec3 l = normalize(light_direction);
 	vec3 halfway = normalize(view + l);
-	vec3 n = normalize(normal);
+	vec3 n = normalize(v2f.normal);
 	color.rgb =
 	albedo.rgb * (diffuse_color.rgb * diffuse(n, l)
 	+ specular(n, halfway, specular_power, dot(n, l)));
