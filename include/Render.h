@@ -39,21 +39,32 @@ struct Vertex_col_data
 	unsigned int distinct_mesh_count;
 };
 
+struct Directional_light
+{
+	glm::vec3 direction;
+	/// <summary>
+	/// rgb = color, a = intensity
+	/// </summary>
+	glm::vec4 color;
+};
+
+struct Point_light
+{
+	glm::vec3 world_position;
+	glm::vec3 color;
+	GLfloat range;
+};
+
 struct Light_data
 {
 	/// <summary>
 	/// rgb = color, a = intensity
 	/// </summary>
 	glm::vec4 ambient_color;
-	glm::vec3 directional_light_dir;
-	/// <summary>
-	/// rgb = color, a = intensity
-	/// </summary>
-	glm::vec4 directional_light_color;
-	/// <summary>
-	/// rgb = color, a = intensity
-	/// </summary>
-	glm::vec4 specular_color;
+	glm::vec3 specular_color;
+	Directional_light directional_light;
+	Point_light* point_lights;
+	GLuint point_light_count;
 };
 
 struct Specular_diffuse_data

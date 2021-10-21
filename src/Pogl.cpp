@@ -2,7 +2,7 @@
 
 
 // Window Dimensions
-constexpr GLint window_width = 800, window_height = 600;
+constexpr GLint window_width = 1240, window_height = 1020;
 
 constexpr float tau = 6.28318531f;
 constexpr float to_radians = tau / 360.f;
@@ -259,19 +259,31 @@ int main()
 		1
 	};
 
+	Directional_light directional_light
+	{
+		glm::vec3(-0.5, -1, 1),
+		glm::vec4(1,1,1,1),
+	};
+
+	GLuint point_light_count = 1;
+
+	Point_light* point_lights = new Point_light[point_light_count]
+	{
+		{}
+	};
+
 	Light_data light_data
 	{
 		glm::vec4(1,1,1,0.1),
-		glm::vec3(-0.5, -1, 1),
-		glm::vec4(1,1,1,1),
-		glm::vec4(1,1,1,0.91)
+		glm::vec3(1,1,1),
+		directional_light
 	};
 
 	Specular_diffuse_instance_render_data instance1_data
 	{
 		texture,
 		glm::vec4(1,1,1,1),
-		32
+		64
 	};
 
 	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
@@ -334,8 +346,8 @@ int main()
 
 		glfwSwapBuffers(window->handle);
 	}
-
 	delete[] tetrahedron_data;
 	delete[] specular_diffuse_instance_data;
+	delete[] point_lights;
 	return 0;
 }

@@ -61,11 +61,12 @@ void render
 	glUniformMatrix4fv(uniforms[3], 1, GL_FALSE, glm::value_ptr(projection_matrix));
 	const glm::vec4& ambient_color = light_data.ambient_color;
 	glUniform4f(uniforms[5], ambient_color.x, ambient_color.y, ambient_color.z, ambient_color.w);
-	const glm::vec4& light_color = light_data.directional_light_color;
+	const Directional_light& directional_light = light_data.directional_light;
+	const glm::vec4& light_color = directional_light.color;
 	glUniform4f(uniforms[6], light_color.x, light_color.y, light_color.z, light_color.w);
 	const glm::vec3& specular_color = light_data.specular_color;
 	glUniform3f(uniforms[7], specular_color.x, specular_color.y, specular_color.z);
-	const glm::vec3& light_direction = light_data.directional_light_dir;
+	const glm::vec3& light_direction = directional_light.direction;
 	glUniform3f(uniforms[8], light_direction.x, light_direction.y, light_direction.z);
 	glUniform3f(uniforms[9], camera_world_pos.x, camera_world_pos.y, camera_world_pos.z);
 	for(unsigned int mesh_index = 0; mesh_index < distinct_mesh_count; ++mesh_index)
