@@ -1,5 +1,7 @@
 #include "../include/Camera.h"
 
+#include <glm/ext/matrix_transform.hpp>
+
 Camera::Camera(const glm::vec3 position, const glm::vec3 forward, const glm::vec3 up)
 {
 	this->position = position;

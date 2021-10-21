@@ -9,36 +9,51 @@ in V2F{
 
 out vec4 color;
 
-uniform vec4 diffuse_color;
-uniform vec4 ambient_color;
-uniform vec4 light_color;
-uniform vec3 specular_color;
-uniform vec3 light_direction;
-uniform vec3 camera_world_pos;
-uniform float specular_power;
-uniform sampler2D albedo_tex;
-
-vec3 diffuse(vec3 normal, vec3 light_direction)
+struct Per_instance
 {
-	vec3 direct_color = light_color.xyz * light_color.w * clamp(dot(normal,light_direction),0,1);
-	return ((ambient_color.rgb * ambient_color.a + direct_color));
+	// rgb = color, a = alpha
+	vec4 diffuse_color;
+	vec3 specular_color;
+	vec3 ambient_color;
+	// x = diffuse, y = specular intensity, z = specular power, 2 = ambient
+	vec4 intensities;
+	sampler2D albedo_tex;
+};
+
+struct Directional_light
+{
+	// rgb = color, a = intensity
+	vec4 color;
+	vec3 direction;
+};
+
+
+uniform Directional_light directional_light;
+uniform Per_instance per_instance;
+uniform vec3 camera_world_pos;
+
+
+float diffuse(vec3 normal, vec3 light_direction)
+{
+	return clamp(dot(normal,light_direction),0,1);
 }
 
-vec3 specular(vec3 normal, vec3 halfway, float specular_power, float nl)
+float specular(vec3 normal, vec3 halfway, float specular_power, float nl)
 {
-	float hightlight = pow(clamp(dot(normal,halfway),0,1), specular_power) * float(nl > 0.0);
-	return light_color.xyz * specular_color.xyz * hightlight;
+	return pow(clamp(dot(normal,halfway),0,1), specular_power) * float(nl > 0.0);
 }
 
 void main()
 {
-	vec4 albedo = texture(albedo_tex, v2f.texcoord_0);
+	vec4 albedo = texture(per_instance.albedo_tex, v2f.texcoord_0);
 	vec3 view = normalize(camera_world_pos - v2f.world_pos.xyz);
-	vec3 l = normalize(light_direction);
+	vec3 l = normalize(directional_light.direction);
 	vec3 halfway = normalize(view + l);
 	vec3 n = normalize(v2f.normal);
-	color.rgb =
-	albedo.rgb * (diffuse_color.rgb * diffuse(n, l)
-	+ specular(n, halfway, specular_power, dot(n, l)));
-	color.a = albedo.a * diffuse_color.a;
+	color.rgb = albedo.rgb * (
+			per_instance.diffuse_color.rgb * diffuse(n, l) * per_instance.intensities.x +
+			specular(n, halfway, per_instance.intensities.y, dot(n, l)) * per_instance.specular_color * per_instance.intensities.z +
+			per_instance.ambient_color.rgb * per_instance.intensities.w
+		);
+	color.a = albedo.a * per_instance.diffuse_color.a;
 }

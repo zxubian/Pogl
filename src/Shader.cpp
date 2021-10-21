@@ -1,4 +1,8 @@
-#include "../include/Shader.h"
+﻿#include "../include/Shader.h"
+
+#include <stdio.h>
+#include <iostream>
+#include <fstream>
 
 Shader::Shader()
 {

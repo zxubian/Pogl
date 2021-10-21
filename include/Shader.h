@@ -1,11 +1,10 @@
 #pragma once
 
-#include <stdio.h>
 #include <string>
-#include <iostream>
-#include <fstream>
 
 #include <gl/glew.h>
+
+struct Uniform;
 
 class Shader
 {
@@ -26,7 +25,6 @@ public:
 
 private:
 	GLuint _id;
-	GLint projection, model, view, main_tex;
 	static void compile_and_add_shader(GLuint shader_id, const char* shader_code, GLenum shader_type);
 	int read_file(const char* file_path, std::string* content) const;
 };

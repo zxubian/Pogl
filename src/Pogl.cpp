@@ -1,6 +1,5 @@
 ﻿#include "../include/Pogl.h"
 
-
 // Window Dimensions
 constexpr GLint window_width = 1240, window_height = 1020;
 
@@ -210,24 +209,10 @@ int main()
 
 	glfwSwapInterval(0);
 
-	GLint vertex_col_uniforms[get_uniform_count(shader_type::vertex_col)];
-	get_uniforms_for_shader(vertex_col_shader.id, vertex_col_uniforms, shader_type::vertex_col);
-	GLint specular_diffuse_uniforms[get_uniform_count(shader_type::specular_diffuse)];
-	get_uniforms_for_shader(specular_diffuse_shader.id, specular_diffuse_uniforms, shader_type::specular_diffuse);
-
-	GLint vertex_col_attributes[get_attribute_count(shader_type::vertex_col)];
-	get_attributes_for_shader(vertex_col_shader.id, vertex_col_attributes, shader_type::vertex_col);
-	GLint specular_diffuse_attributes[get_attribute_count(shader_type::specular_diffuse)];
-	get_attributes_for_shader(specular_diffuse_shader.id, specular_diffuse_attributes, shader_type::specular_diffuse);
-
 	Program_render_data program_render_data
 	{
 		vertex_col_shader.id,
-		vertex_col_uniforms,
-		vertex_col_attributes,
 		specular_diffuse_shader.id,
-		specular_diffuse_uniforms,
-		specular_diffuse_attributes
 	};
 
 	Transform vertex_col_transforms[1] =
@@ -274,16 +259,18 @@ int main()
 
 	Light_data light_data
 	{
-		glm::vec4(1,1,1,0.1),
-		directional_light
+		directional_light,
+		point_lights,
+		point_light_count
 	};
 
 	Specular_diffuse_instance_render_data instance1_data
 	{
-		texture,
 		glm::vec4(1,1,1,1),
 		glm::vec3(1,1,1),
-		64
+		glm::vec3(0.1,0.1,0.1),
+		glm::vec4(1,64,1,1),
+		texture
 	};
 
 	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
@@ -346,8 +333,10 @@ int main()
 
 		glfwSwapBuffers(window->handle);
 	}
+
 	delete[] tetrahedron_data;
 	delete[] specular_diffuse_instance_data;
 	delete[] point_lights;
+
 	return 0;
 }

@@ -2,29 +2,26 @@
 
 #include <gl/glew.h>
 #include <glm/glm.hpp>
-#include <glm/detail/type_quat.hpp>
 
 #include "Mesh.h"
 #include "Transform.h"
+#include "Light.h"
 
 class Texture;
 
 struct Program_render_data
 {
 	GLuint vertex_col_shader_id;
-	GLint* vertex_col_uniforms;
-	GLint* vertex_col_attributes;
 	GLuint specular_diffuse_shader_id;
-	GLint* specular_diffuse_uniforms;
-	GLint* specular_diffuse_attributes;
 };
 
 struct Specular_diffuse_instance_render_data
 {
-	Texture* texture;
 	glm::vec4 diffuse_color;
 	glm::vec3 specular_color;
-	GLfloat specular_power;
+	glm::vec3 ambient_color;
+	glm::vec4 intensities;
+	Texture* albedo_texture;
 };
 
 struct Mesh_render_data
@@ -38,33 +35,6 @@ struct Vertex_col_data
 {
 	Mesh_render_data* meshes;
 	unsigned int distinct_mesh_count;
-};
-
-struct Directional_light
-{
-	glm::vec3 direction;
-	/// <summary>
-	/// rgb = color, a = intensity
-	/// </summary>
-	glm::vec4 color;
-};
-
-struct Point_light
-{
-	glm::vec3 world_position;
-	glm::vec3 color;
-	GLfloat range;
-};
-
-struct Light_data
-{
-	/// <summary>
-	/// rgb = color, a = intensity
-	/// </summary>
-	glm::vec4 ambient_color;
-	Directional_light directional_light;
-	Point_light* point_lights;
-	GLuint point_light_count;
 };
 
 struct Specular_diffuse_data
