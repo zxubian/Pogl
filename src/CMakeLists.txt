@@ -13,3 +13,8 @@ find_package(glm CONFIG REQUIRED)
 
 target_include_directories(${PROJECT_NAME} PRIVATE ${OPENGL_INCLUDE_DIRS} ${GLEW_INCLUDE_DIRS} ${GLFW3_INCLUDE_DIRS} ${GLM_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE glfw OpenGL::GL ${GLEW_LIBRARIES} glm::glm)
+
+add_custom_command(TARGET ${PROJECT_NAME}  POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_CURRENT_SOURCE_DIR}/../data
+                ${CMAKE_CURRENT_BINARY_DIR}/data)

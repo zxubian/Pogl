@@ -11,11 +11,11 @@ constexpr float tri_angle_increment = 0.005f;
 float current_angle = 0.f;
 float current_scale = 1.f;
 
-const char* vertex_col_vert_path = "../../../data/shaders/vertex_col.vert";
-const char* vertex_col_frag_path = "../../../data/shaders/vertex_col.frag";
-const char* specular_diffuse_vert_path = "../../../data/shaders/specular_diffuse.vert";
-const char* specular_diffuse_frag_path = "../../../data/shaders/specular_diffuse.frag";
-const char* texture_path = "../../../data/textures/uv_checker.png";
+const char* vertex_col_vert_path = "./data/shaders/vertex_col.vert";
+const char* vertex_col_frag_path = "./data/shaders/vertex_col.frag";
+const char* specular_diffuse_vert_path = "./data/shaders/specular_diffuse.vert";
+const char* specular_diffuse_frag_path = "./data/shaders/specular_diffuse.frag";
+const char* texture_path = "./data/textures/uv_checker.png";
 
 // Fragment Shader:
 
