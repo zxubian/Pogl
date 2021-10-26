@@ -4,6 +4,8 @@
 
 #include "../include/Texture.h"
 
+constexpr  GLuint MAX_POINT_LIGHTS = 10;
+
 void set_directional_light(const GLuint& id, const Directional_light& data)
 {
 	const glm::vec4& color = data.color;
@@ -14,7 +16,21 @@ void set_directional_light(const GLuint& id, const Directional_light& data)
 
 void set_point_lights(const GLuint& id, const Point_light* point_lights, GLuint point_light_count)
 {
-
+	char location_string[128]{'\0'};
+	glUniform1i(glGetUniformLocation(id, "point_light_count"), static_cast<int>(point_light_count));
+	for(GLuint i = 0; i < point_light_count; ++i)
+	{
+		const Point_light light = point_lights[i];
+		const glm::vec3 attenuation_constants = calculate_attenuation_constant(light.max_distance, light.falloff);
+		const glm::vec3 color = light.color;
+		const glm::vec3 world_position = light.world_position;
+		sprintf_s(location_string, "point_lights[%d].color", i);
+		glUniform3f(glGetUniformLocation(id, location_string), color.x, color.y, color.z);
+		sprintf_s(location_string, "point_lights[%d].position", i);
+		glUniform3f(glGetUniformLocation(id, location_string), world_position.x, world_position.y, world_position.z);
+		sprintf_s(location_string, "point_lights[%d].attenuation_constants", i);
+		glUniform3f(glGetUniformLocation(id, location_string), attenuation_constants.x, attenuation_constants.y, attenuation_constants.z);
+	}
 }
 
 void set_instance_data(const GLuint id, const Specular_diffuse_instance_render_data& data)
@@ -56,11 +72,11 @@ void render
 	glUniformMatrix4fv(glGetUniformLocation(shader_id, "vp_matrix"), 1, GL_FALSE, glm::value_ptr(vp_matrix));
 	for(unsigned int mesh_index = 0; mesh_index < distinct_mesh_count; ++mesh_index)
 	{
-		const Mesh_render_data mesh_data = vertex_col.meshes[mesh_index];
-		Mesh* mesh = mesh_data.mesh;
+		const Mesh_render_data& mesh_data = vertex_col.meshes[mesh_index];
+		const Mesh* mesh = mesh_data.mesh;
 		glBindVertexArray(mesh->vao);
-		GLuint pos_location = glGetAttribLocation(shader_id, "pos");
-		GLuint col_location = glGetAttribLocation(shader_id, "col");
+		const GLuint pos_location = glGetAttribLocation(shader_id, "pos");
+		const GLuint col_location = glGetAttribLocation(shader_id, "col");
 		mesh->positions_attribute_pointer(pos_location);
 		mesh->colors_attribute_pointer(col_location);
 		glEnableVertexAttribArray(pos_location);
@@ -96,6 +112,8 @@ void render
 	const Light_data& light_data = per_frame_render_data->light_data;
 
 	set_directional_light(shader_id, light_data.directional_light);
+
+	set_point_lights(shader_id, light_data.point_lights, light_data.point_light_count);
 
 	for(unsigned int mesh_index = 0; mesh_index < distinct_mesh_count; ++mesh_index)
 	{

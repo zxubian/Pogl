@@ -247,14 +247,19 @@ int main()
 	Directional_light directional_light
 	{
 		glm::vec3(-0.5, -1, 1),
-		glm::vec4(1,1,1,1),
+		glm::vec4(1,1,1,0.3),
 	};
 
 	GLuint point_light_count = 1;
 
 	Point_light* point_lights = new Point_light[point_light_count]
 	{
-		{}
+		{
+			{0,0,0},
+			{1,1,1},
+			100,
+			3
+		}
 	};
 
 	Light_data light_data
@@ -269,7 +274,7 @@ int main()
 		glm::vec4(1,1,1,1),
 		glm::vec3(1,1,1),
 		glm::vec3(0.1,0.1,0.1),
-		glm::vec4(1,64,1,1),
+		glm::vec4(1,1,64,1),
 		texture
 	};
 
