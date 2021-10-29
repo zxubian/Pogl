@@ -206,18 +206,33 @@ int main()
 	Directional_light directional_light
 	{
 		glm::vec3(-0.5, -1, 1),
-		glm::vec4(1,1,1,0.3),
+		glm::vec4(1,1,1,0),
 	};
 
 	GLuint point_light_count = 1;
 
-	Point_light* point_lights = new Point_light[point_light_count]
+	Point_light* point_lights = new Point_light[]
 	{
 		{
-			{0,0,0},
+			{0,-1.5,10},
 			{1,1,1},
-			100,
-			3
+			1.f,
+			100.f
+		}
+	};
+
+	GLuint spot_light_count = 1;
+
+	Spot_light* spot_lights = new Spot_light[]
+	{
+		{
+			{0,1,5},
+			glm::normalize(glm::vec3(2,-1,0)),
+			{1,1,1},
+			10.f,
+			1000.f,
+			glm::radians(0.f),
+			glm::radians(10.f)
 		}
 	};
 
@@ -225,7 +240,9 @@ int main()
 	{
 		directional_light,
 		point_lights,
-		point_light_count
+		point_light_count,
+		spot_lights,
+		spot_light_count
 	};
 
 	Specular_diffuse_instance_render_data tetrahedron1
@@ -246,7 +263,7 @@ int main()
 	{
 		glm::vec4(1,1,1,1),
 		glm::vec3(1,1,1),
-		glm::vec3(0.1,0.1,0.1),
+		glm::vec3(0,0,0),
 		glm::vec4(1,1,64,1),
 		texture
 	};

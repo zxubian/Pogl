@@ -5,6 +5,7 @@
 #include "../include/Texture.h"
 
 constexpr GLuint MAX_POINT_LIGHTS = 10;
+constexpr GLuint MAX_SPOT_LIGHTS = 10;
 
 void set_directional_light(const GLuint& id, const Directional_light& data)
 {
@@ -22,7 +23,7 @@ void set_point_lights(const GLuint& id, const Point_light* point_lights, GLuint 
 	for(GLuint i = 0; i < point_light_count; ++i)
 	{
 		const Point_light light = point_lights[i];
-		const glm::vec3 attenuation_constants = calculate_attenuation_constant(light.max_distance, light.falloff);
+		const glm::vec2 attenuation_constants = calculate_inverse_square_attenuation_constants(light.min_distance, light.max_distance);
 		const glm::vec3 color = light.color;
 		const glm::vec3 world_position = light.world_position;
 		sprintf_s(location_string, "point_lights[%d].color", i);
@@ -30,7 +31,34 @@ void set_point_lights(const GLuint& id, const Point_light* point_lights, GLuint 
 		sprintf_s(location_string, "point_lights[%d].position", i);
 		glUniform3f(glGetUniformLocation(id, location_string), world_position.x, world_position.y, world_position.z);
 		sprintf_s(location_string, "point_lights[%d].attenuation_constants", i);
-		glUniform3f(glGetUniformLocation(id, location_string), attenuation_constants.x, attenuation_constants.y, attenuation_constants.z);
+		glUniform2f(glGetUniformLocation(id, location_string), attenuation_constants.x, attenuation_constants.y);
+	}
+}
+
+void set_spot_lights(const GLuint& id, const Spot_light* spot_lights, GLuint spot_light_count)
+{
+	char location_string[128]{'\0'};
+	spot_light_count = glm::min(spot_light_count, MAX_SPOT_LIGHTS);
+	glUniform1i(glGetUniformLocation(id, "spot_light_count"), static_cast<int>(spot_light_count));
+	for(GLuint i = 0; i < spot_light_count; ++i)
+	{
+		const Spot_light light = spot_lights[i];
+		const glm::vec2 attenuation_constants = calculate_inverse_square_attenuation_constants(light.min_distance, light.max_distance);
+		const glm::vec3 color = light.color;
+		const glm::vec3 world_position = light.world_position;
+		const glm::vec3 orientation = light.world_direction;
+		sprintf_s(location_string, "spot_lights[%d].position", i);
+		glUniform3f(glGetUniformLocation(id, location_string), world_position.x, world_position.y, world_position.z);
+		sprintf_s(location_string, "spot_lights[%d].orientation", i);
+		glUniform3f(glGetUniformLocation(id, location_string), orientation.x, orientation.y, orientation.z);
+		sprintf_s(location_string, "spot_lights[%d].color", i);
+		glUniform3f(glGetUniformLocation(id, location_string), color.x, color.y, color.z);
+		sprintf_s(location_string, "spot_lights[%d].attenuation_constants", i);
+		glUniform2f(glGetUniformLocation(id, location_string), attenuation_constants.x, attenuation_constants.y);
+		sprintf_s(location_string, "spot_lights[%d].cos_theta_max", i);
+		glUniform1f(glGetUniformLocation(id, location_string), cos(light.theta_max));
+		sprintf_s(location_string, "spot_lights[%d].cos_theta_min", i);
+		glUniform1f(glGetUniformLocation(id, location_string), cos(light.theta_min));
 	}
 }
 
@@ -115,8 +143,8 @@ void render
 	const Light_data& light_data = per_frame_render_data->light_data;
 
 	set_directional_light(shader_id, light_data.directional_light);
-
 	set_point_lights(shader_id, light_data.point_lights, light_data.point_light_count);
+	set_spot_lights(shader_id, light_data.spot_lights, light_data.spot_light_count);
 
 	for(unsigned int mesh_index = 0; mesh_index < distinct_mesh_count; ++mesh_index)
 	{
