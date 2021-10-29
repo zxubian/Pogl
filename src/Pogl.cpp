@@ -32,40 +32,40 @@ void update_camera(Camera& camera, const Input_state& input_state, const double&
 
 	glm::vec4 translation = glm::vec4{ 0 };
 
-	if(input_state.get_w_pressed())
+	if (input_state.get_w_pressed())
 	{
-		translation += glm::vec4(0, 0, 1,0);
+		translation += glm::vec4(0, 0, 1, 0);
 	}
-	else if(input_state.get_s_pressed())
+	else if (input_state.get_s_pressed())
 	{
-		translation -= glm::vec4(0, 0, 1,0);
+		translation -= glm::vec4(0, 0, 1, 0);
 	}
-	if(input_state.get_d_pressed())
+	if (input_state.get_d_pressed())
 	{
-		translation += glm::vec4(1, 0, 0,0);
+		translation += glm::vec4(1, 0, 0, 0);
 	}
-	else if(input_state.get_a_pressed())
+	else if (input_state.get_a_pressed())
 	{
-		translation -= glm::vec4(1, 0, 0,0);
+		translation -= glm::vec4(1, 0, 0, 0);
 	}
 	translation *= camera_move_speed * static_cast<GLfloat>(delta_time);
-	translation = camera.transform_matrix* translation;
+	translation = camera.transform_matrix * translation;
 	camera.position += static_cast<glm::vec3>(translation);
 	camera.recalculate_matricies();
 }
 
 void GLAPIENTRY
-MessageCallback( GLenum source,
-                 GLenum type,
-                 GLuint id,
-                 GLenum severity,
-                 GLsizei length,
-                 const GLchar* message,
-                 const void* userParam )
+MessageCallback(GLenum source,
+	GLenum type,
+	GLuint id,
+	GLenum severity,
+	GLsizei length,
+	const GLchar* message,
+	const void* userParam)
 {
-  fprintf( stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
-           ( type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : "" ),
-            type, severity, message );
+	fprintf(stderr, "GL CALLBACK: %s type = 0x%x, severity = 0x%x, message = %s\n",
+		(type == GL_DEBUG_TYPE_ERROR ? "** GL ERROR **" : ""),
+		type, severity, message);
 }
 
 int main()
@@ -73,7 +73,7 @@ int main()
 	// Init GLFW
 	auto status = glfwInit();
 	const char* errorMessage;
-	if(!status)
+	if (!status)
 	{
 		glfwGetError(&errorMessage);
 		glfwTerminate();
@@ -93,12 +93,11 @@ int main()
 
 
 	// During init, enable debug output
-
 	Input_state input_state = {};
 
 	Pogl_window* window = new Pogl_window(window_width, window_height, input_state);
 
-	if(!window->is_initialized())
+	if (!window->is_initialized())
 	{
 		delete window;
 		glfwGetError(&errorMessage);
@@ -114,7 +113,7 @@ int main()
 	// Allow modern extension features
 	glewExperimental = GL_TRUE;
 
-	if(glewInit() != GLEW_OK)
+	if (glewInit() != GLEW_OK)
 	{
 		std::cerr << "GLEW init error";
 		delete window;
@@ -122,8 +121,8 @@ int main()
 		return 1;
 	}
 
-	glEnable( GL_DEBUG_OUTPUT );
-	glDebugMessageCallback( MessageCallback, 0 );
+	glEnable(GL_DEBUG_OUTPUT);
+	glDebugMessageCallback(MessageCallback, 0);
 
 	// Get Buffer size information
 	int buffer_width, buffer_height;
@@ -164,13 +163,22 @@ int main()
 		Transform { glm::translate(glm::mat4x4{1}, glm::vec3(-3,-2,5))},
 	};
 
-	Transform specular_diffuse_transforms[1] =
+	Transform tetrahedron_transforms[1] =
 	{
 		Transform { glm::translate(glm::mat4x4{1}, glm::vec3(3,-2,5))}
 	};
 
-	Mesh* tetrahedron = create_tetrahedron();
+	glm::mat4x4 plane_transform = glm::translate(glm::mat4x4{ 1 }, glm::vec3(0, -2, 0));
+	plane_transform = glm::rotate(plane_transform, glm::radians(-90.f), glm::vec3(1, 0, 0));
+	plane_transform = glm::scale(plane_transform, glm::vec3(100));
 
+	Transform plane_transforms[1] =
+	{
+		Transform {plane_transform}
+	};
+
+	Mesh* tetrahedron = create_tetrahedron();
+	Mesh* plane = create_plane();
 	Texture* texture = new Texture(texture_path);
 	texture->load_texture();
 
@@ -181,11 +189,18 @@ int main()
 		1
 	};
 
-	Mesh_render_data specular_diffuse_mesh
+	Mesh_render_data specular_diffuse_meshes[] =
 	{
-		tetrahedron,
-		specular_diffuse_transforms,
-		1
+		{
+			tetrahedron,
+			tetrahedron_transforms,
+			1
+		},
+		{
+			plane,
+			plane_transforms,
+			1
+		}
 	};
 
 	Directional_light directional_light
@@ -213,7 +228,7 @@ int main()
 		point_light_count
 	};
 
-	Specular_diffuse_instance_render_data instance1_data
+	Specular_diffuse_instance_render_data tetrahedron1
 	{
 		glm::vec4(1,1,1,1),
 		glm::vec3(1,1,1),
@@ -224,19 +239,34 @@ int main()
 
 	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
 	{
-		instance1_data
+		tetrahedron1
 	};
 
-	Specular_diffuse_instance_render_data** specular_diffuse_instance_data = new Specular_diffuse_instance_render_data*[1]
+	Specular_diffuse_instance_render_data plane1
 	{
-		tetrahedron_data
+		glm::vec4(1,1,1,1),
+		glm::vec3(1,1,1),
+		glm::vec3(0.1,0.1,0.1),
+		glm::vec4(1,1,64,1),
+		texture
+	};
+
+	Specular_diffuse_instance_render_data* plane_data = new Specular_diffuse_instance_render_data[1]
+	{
+		plane1
+	};
+
+	Specular_diffuse_instance_render_data** specular_diffuse_instance_data = new Specular_diffuse_instance_render_data * [2]
+	{
+		tetrahedron_data,
+		plane_data
 	};
 
 	Specular_diffuse_data specular_diffuse
 	{
-		&specular_diffuse_mesh,
+		specular_diffuse_meshes,
 		specular_diffuse_instance_data,
-		1,
+		2,
 	};
 
 	Vertex_col_data vertex_col
@@ -260,7 +290,7 @@ int main()
 
 
 	// Loop until window closed
-	while(!window->should_close())
+	while (!window->should_close())
 	{
 		time = glfwGetTime();
 		delta_time = time - last_time;
