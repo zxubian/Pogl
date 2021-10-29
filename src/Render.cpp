@@ -4,7 +4,7 @@
 
 #include "../include/Texture.h"
 
-constexpr  GLuint MAX_POINT_LIGHTS = 10;
+constexpr GLuint MAX_POINT_LIGHTS = 10;
 
 void set_directional_light(const GLuint& id, const Directional_light& data)
 {
@@ -17,6 +17,7 @@ void set_directional_light(const GLuint& id, const Directional_light& data)
 void set_point_lights(const GLuint& id, const Point_light* point_lights, GLuint point_light_count)
 {
 	char location_string[128]{'\0'};
+	point_light_count = glm::min(point_light_count, MAX_POINT_LIGHTS);
 	glUniform1i(glGetUniformLocation(id, "point_light_count"), static_cast<int>(point_light_count));
 	for(GLuint i = 0; i < point_light_count; ++i)
 	{
