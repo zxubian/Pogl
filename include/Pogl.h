@@ -15,10 +15,11 @@
 #include <iostream>
 #include <vector>
 
-#include "PoglWindow.h"
 #include "Camera.h"
 #include "Mesh.h"
-#include "Texture.h"
-#include "Shader.h"
+#include "PoglWindow.h"
 #include "Render.h"
+#include "Shader.h"
+#include "Shapes.h"
+#include "Texture.h"
 #include "Utils.h"

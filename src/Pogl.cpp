@@ -3,9 +3,6 @@
 // Window Dimensions
 constexpr GLint window_width = 1240, window_height = 1020;
 
-constexpr float tau = 6.28318531f;
-constexpr float to_radians = tau / 360.f;
-
 constexpr float tri_angle_increment = 0.005f;
 
 float current_angle = 0.f;
@@ -18,59 +15,6 @@ const char* specular_diffuse_frag_path = "./data/shaders/specular_diffuse.frag";
 const char* texture_path = "./data/textures/uv_checker.png";
 
 // Fragment Shader:
-
-Mesh* create_tetrahedron()
-{
-	const auto cos_theta = cos(120.f * to_radians);
-	const auto sin_theta = sin(120.f * to_radians);
-
-	GLfloat vertices[] =
-	{
-		1.0f,0.f,0.f,
-		cos_theta, 0,sin_theta,
-		cos_theta, 0,-sin_theta,
-		0.f,sqrt(2.f),0.f
-	};
-
-	constexpr GLfloat texcoord_0[] =
-	{
-		0.f,0.f,
-		1.f,0.f,
-		0.5f,0.f,
-		0.5f,1.f
-	};
-
-	constexpr unsigned char colors[] =
-	{
-		255,0,0,255,
-		0,255,0,255,
-		0,0,255,255,
-		255,255,0,255
-	};
-
-	GLuint index_count = 12;
-	GLuint vertex_count = 4;
-
-	constexpr glm::uint indices[] = {
-		0,3,1,
-		2,1,3,
-		2,3,0,
-		0,1,2
-	};
-
-	glm::vec3* normals = new glm::vec3[vertex_count];
-
-	for(GLuint i = 0; i < vertex_count; ++i)
-	{
-		normals[i] = glm::vec3{ 0 };
-	}
-
-	generate_normals(reinterpret_cast<glm::vec3*>(vertices), indices, vertex_count, index_count, normals);
-	const auto tetrahedron = new Mesh();
-	tetrahedron->create_mesh(vertices, texcoord_0, reinterpret_cast<GLfloat*>(normals), colors, indices, 4, 12);
-	delete[](normals);
-	return tetrahedron;
-}
 
 void update_camera(Camera& camera, const Input_state& input_state, const double& delta_time)
 {
