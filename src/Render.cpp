@@ -78,11 +78,12 @@ void render
 		glBindVertexArray(mesh->vao);
 		const GLuint pos_location = glGetAttribLocation(shader_id, "pos");
 		const GLuint col_location = glGetAttribLocation(shader_id, "col");
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 		mesh->positions_attribute_pointer(pos_location);
 		mesh->colors_attribute_pointer(col_location);
 		glEnableVertexAttribArray(pos_location);
 		glEnableVertexAttribArray(col_location);
-		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
 		for(unsigned int instance_index = 0; instance_index < mesh_data.instance_count; ++instance_index)
 		{
 			const Transform transform = mesh_data.transforms[instance_index];
@@ -93,6 +94,7 @@ void render
 		glDisableVertexAttribArray(pos_location);
 		glDisableVertexAttribArray(col_location);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 
@@ -123,7 +125,7 @@ void render
 		const Specular_diffuse_instance_render_data* per_instance_data_array = specular_diffuse.per_instance_data[mesh_index];
 		glBindVertexArray(mesh->vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
-
+		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
 		GLuint pos_location = glGetAttribLocation(shader_id, "pos");
 		GLuint uv_location = glGetAttribLocation(shader_id, "uv");
 		GLuint norm_location = glGetAttribLocation(shader_id, "norm");
@@ -152,6 +154,7 @@ void render
 		glDisableVertexAttribArray(uv_location);
 		glDisableVertexAttribArray(norm_location);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+		glBindBuffer(GL_ARRAY_BUFFER, 0);
 		glBindVertexArray(0);
 	}
 	glUseProgram(0);
