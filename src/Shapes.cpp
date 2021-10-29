@@ -58,3 +58,51 @@ Mesh* create_tetrahedron()
 }
 
 
+Mesh* create_plane()
+{
+	constexpr GLint vertex_count = 4;
+	constexpr GLint index_count = 6;
+
+	GLfloat vertices[] =
+	{
+		-0.5f, -0.5f, 0,
+		-0.5f, 0.5f, 0,
+		0.5f, 0.5f, 0,
+		0.5f, -0.5f, 0,
+	};
+
+	GLfloat texcoord_0[] =
+	{
+		0.f,0.f,
+		0.f,1.f,
+		1.f,1.f,
+		1.f,0.f
+	};
+
+	unsigned char colors[] =
+	{
+		255,0,0,255,
+		0,255,0,255,
+		0,0,255,255,
+		255,255,0,255
+	};
+
+	glm::uint indices[] = {
+		0,1,2,
+		0,2,3
+	};
+
+	glm::vec3* normals = new glm::vec3[vertex_count];
+
+	for(GLuint i = 0; i < vertex_count; ++i)
+	{
+		normals[i] = glm::vec3{ 0 };
+	}
+
+	generate_normals(reinterpret_cast<glm::vec3*>(vertices), indices, vertex_count, index_count, normals);
+	const auto plane = new Mesh();
+	plane->create_mesh(vertices, texcoord_0, reinterpret_cast<GLfloat*>(normals), colors, indices, vertex_count, index_count);
+	delete[](normals);
+	return plane;
+}
+
