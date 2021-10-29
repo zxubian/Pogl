@@ -1,7 +1,7 @@
 ﻿#include "../include/Pogl.h"
 
 // Window Dimensions
-constexpr GLint window_width = 1240, window_height = 1020;
+constexpr GLint window_width = 1280, window_height = 720;
 
 constexpr float tri_angle_increment = 0.005f;
 
