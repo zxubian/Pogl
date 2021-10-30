@@ -20,6 +20,7 @@ Pogl is my Playground for learning OpenGL and practicing C++.
 ### Future Work
 * Load arbitrary models:
     * [Assimp](https://github.com/assimp/assimp) 
+* Shadow maps
 * More interesting shading:
     * [Disney/Unreal physically-based rendering](https://blog.selfshadow.com/publications/s2013-shading-course/)
 * OpenGL optimization:
