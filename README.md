@@ -2,6 +2,8 @@
 
 Pogl is my Playground for learning OpenGL and practicing C++.
 
+<img src="github/screenshot.png" width="500"/>
+
 ### Goals
 * Display 3d models
 * Shade them with Blinn-Phong shading
