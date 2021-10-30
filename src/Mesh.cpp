@@ -14,15 +14,19 @@ Mesh::Mesh()
 
 void Mesh::create_mesh
 (
-		const GLfloat* vertices,
-		const GLfloat* tex_coords,
-		const GLfloat* normals,
-		const unsigned char* colors,
-		const unsigned int* indices,
-		GLsizei vertex_count, GLsizei index_count
+	const GLfloat* vertices,
+	const GLfloat* tex_coords,
+	const GLfloat* normals,
+	const unsigned char* colors,
+	const unsigned int* indices,
+	GLsizei vertex_count, GLsizei index_count,
+	Texture** diffuse_maps,
+	unsigned int diffuse_count
 )
 {
 	this->index_count = index_count;
+	this->diffuse_maps = diffuse_maps;
+	this->diffuse_count = diffuse_count;
 	glGenVertexArrays(1, &vao);
 	glBindVertexArray(vao);
 	{
@@ -49,6 +53,55 @@ void Mesh::create_mesh
 			offset += normal_size;
 			glBufferSubData(GL_ARRAY_BUFFER, offset, color_size, colors);
 			offset += color_size;
+		}
+		glGenBuffers(1, &ibo);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+		{
+			glBufferData(GL_ELEMENT_ARRAY_BUFFER, index_count * sizeof indices[0], indices, GL_STATIC_DRAW);
+		}
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	}
+	glBindVertexArray(0);
+}
+
+
+void Mesh::create_mesh
+(
+	const GLfloat* vertices,
+	const GLfloat* tex_coords,
+	const GLfloat* normals,
+	const unsigned int* indices,
+	GLsizei vertex_count, GLsizei index_count,
+	Texture** diffuse_maps,
+	unsigned int diffuse_count
+)
+{
+	this->index_count = index_count;
+	this->diffuse_maps = diffuse_maps;
+	this->diffuse_count = diffuse_count;
+	glGenVertexArrays(1, &vao);
+	glBindVertexArray(vao);
+	{
+		glGenBuffers(1, &vbo);
+		glBindBuffer(GL_ARRAY_BUFFER, vbo);
+		{
+			vertex_size = vertex_count * 3 * sizeof(vertices[0]);
+			texcoord_size = vertex_count * 2 * sizeof(tex_coords[0]);
+			normal_size = vertex_count * 3 * sizeof(normals[0]);
+
+			glBufferData(GL_ARRAY_BUFFER, vertex_count*(vertex_size + texcoord_size + normal_size + color_size), nullptr, GL_STATIC_DRAW);
+
+			// Merge attributes into single vbo
+			// https://www.khronos.org/opengl/wiki/Vertex_Specification_Best_Practices
+			// https://www.haroldserrano.com/blog/loading-vertex-normal-and-uv-data-onto-opengl-buffers
+
+			GLintptr offset = 0;
+			glBufferSubData(GL_ARRAY_BUFFER, offset, vertex_size, vertices);
+			offset += vertex_size;
+			glBufferSubData(GL_ARRAY_BUFFER, offset, texcoord_size, tex_coords);
+			offset += texcoord_size;
+			glBufferSubData(GL_ARRAY_BUFFER, offset, normal_size, normals);
+			offset += normal_size;
 		}
 		glGenBuffers(1, &ibo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);

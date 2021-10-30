@@ -9,8 +9,8 @@ Mesh* create_tetrahedron()
 	const GLfloat cos_theta = cos(120.f * to_radians);
 	const GLfloat sin_theta = sin(120.f * to_radians);
 
-	GLint vertex_count = 4;
-	GLint index_count = 12;
+	GLuint vertex_count = 4;
+	GLuint index_count = 12;
 
 	GLfloat vertices[] =
 	{
@@ -49,10 +49,9 @@ Mesh* create_tetrahedron()
 	{
 		normals[i] = glm::vec3{ 0 };
 	}
-
 	generate_normals(reinterpret_cast<glm::vec3*>(vertices), indices, vertex_count, index_count, normals);
 	const auto tetrahedron = new Mesh();
-	tetrahedron->create_mesh(vertices, texcoord_0, reinterpret_cast<GLfloat*>(normals), colors, indices, vertex_count, index_count);
+	tetrahedron->create_mesh(vertices, texcoord_0, reinterpret_cast<GLfloat*>(normals), colors, indices, vertex_count, index_count, nullptr, 0);
 	delete[](normals);
 	return tetrahedron;
 }
@@ -60,8 +59,8 @@ Mesh* create_tetrahedron()
 
 Mesh* create_plane()
 {
-	constexpr GLint vertex_count = 4;
-	constexpr GLint index_count = 6;
+	constexpr GLuint vertex_count = 4;
+	constexpr GLuint index_count = 6;
 
 	GLfloat vertices[] =
 	{
@@ -101,7 +100,7 @@ Mesh* create_plane()
 
 	generate_normals(reinterpret_cast<glm::vec3*>(vertices), indices, vertex_count, index_count, normals);
 	const auto plane = new Mesh();
-	plane->create_mesh(vertices, texcoord_0, reinterpret_cast<GLfloat*>(normals), colors, indices, vertex_count, index_count);
+	plane->create_mesh(vertices, texcoord_0, reinterpret_cast<GLfloat*>(normals), colors, indices, vertex_count, index_count, nullptr, 0);
 	delete[](normals);
 	return plane;
 }

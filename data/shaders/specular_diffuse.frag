@@ -9,7 +9,7 @@ in V2F{
 
 out vec4 color;
 
-struct Per_instance
+struct Material
 {
 	// rgb = color, a = alpha
 	vec4 diffuse_color;
@@ -17,7 +17,7 @@ struct Per_instance
 	vec3 ambient_color;
 	// x = diffuse, y = specular intensity, z = specular power, w = ambient
 	vec4 intensities;
-	sampler2D albedo_tex;
+	sampler2D texture_diffuse_0;
 };
 
 struct Directional_light
@@ -52,12 +52,11 @@ struct Spot_light
 // For inverse square, use vec2
 // ( x = r0^2/(rmax2 - r0^2), y = rmax2)
 
-
 #define MAX_POINT_LIGHTS 10
 #define MAX_SPOT_LIGHTS 10
 
 uniform Directional_light directional_light;
-uniform Per_instance per_instance;
+uniform Material material;
 uniform vec3 camera_world_pos;
 
 uniform Point_light[MAX_POINT_LIGHTS] point_lights;
@@ -65,6 +64,7 @@ uniform int point_light_count;
 
 uniform Spot_light[MAX_SPOT_LIGHTS] spot_lights;
 uniform int spot_light_count;
+
 
 float calculate_diffuse(vec3 normal, vec3 light_direction)
 {
@@ -96,20 +96,20 @@ float calculate_angular_attenuation(float cos_theta, float cos_theta_min, float 
 
 vec3 calculate_light_from_direction(vec3 n, vec3 l, vec3 view)
 {
-	float diffuse = calculate_diffuse(n,l) * per_instance.intensities.x;
+	float diffuse = calculate_diffuse(n,l) * material.intensities.x;
 	vec3 halfway = normalize(view + l);
-	float specular = calculate_specular(n, halfway, per_instance.intensities.z, dot(n, l)) * per_instance.intensities.y;
-	return diffuse * per_instance.diffuse_color.rgb + specular * per_instance.specular_color;
+	float specular = calculate_specular(n, halfway, material.intensities.z, dot(n, l)) * material.intensities.y;
+	return diffuse * material.diffuse_color.rgb + specular * material.specular_color;
 }
 
 void main()
 {
-	vec4 albedo = texture(per_instance.albedo_tex, v2f.texcoord_0);
+	vec4 albedo = texture(material.texture_diffuse_0, v2f.texcoord_0);
 	vec3 view = normalize(camera_world_pos - v2f.world_pos.xyz);
 	vec3 n = normalize(v2f.normal);
 
 	vec3 ldir = normalize(directional_light.direction);
-	color.rgb = albedo.rgb * per_instance.diffuse_color.rgb;
+	color.rgb = albedo.rgb * material.diffuse_color.rgb;
 	vec3 light_color = calculate_light_from_direction(n,ldir,view) * directional_light.color.rgb * directional_light.color.a;
 	for(int i = 0; i < point_light_count; i++)
 	{
@@ -130,7 +130,7 @@ void main()
 		current_light_color *= calculate_angular_attenuation(cos_theta, light.cos_theta_min, light.cos_theta_max);
 		light_color += current_light_color;
 	}
-	light_color += per_instance.ambient_color * per_instance.intensities.w;
+	light_color += material.ambient_color * material.intensities.w;
 	color.rgb *= light_color;
-	color.a = albedo.a * per_instance.diffuse_color.a;
+	color.a = albedo.a * material.diffuse_color.a;
 }

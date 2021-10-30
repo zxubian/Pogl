@@ -15,7 +15,7 @@ struct Program_render_data
 	GLuint specular_diffuse_shader_id;
 };
 
-struct Specular_diffuse_instance_render_data
+struct Specular_diffuse_material_data
 {
 	glm::vec4 diffuse_color;
 	glm::vec3 specular_color;
@@ -40,7 +40,7 @@ struct Vertex_col_data
 struct Specular_diffuse_data
 {
 	Mesh_render_data* meshes;
-	Specular_diffuse_instance_render_data** per_instance_data;
+	Specular_diffuse_material_data** material_data;
 	unsigned int distinct_mesh_count;
 };
 

@@ -1,11 +1,10 @@
 #include "../include/Render.h"
-
 #include <glm/gtc/type_ptr.hpp>
-
 #include "../include/Texture.h"
 
 constexpr GLuint MAX_POINT_LIGHTS = 10;
 constexpr GLuint MAX_SPOT_LIGHTS = 10;
+constexpr GLuint MAX_TEXTURE_COUNT = 1;
 
 void set_directional_light(const GLuint& id, const Directional_light& data)
 {
@@ -62,19 +61,32 @@ void set_spot_lights(const GLuint& id, const Spot_light* spot_lights, GLuint spo
 	}
 }
 
-void set_instance_data(const GLuint id, const Specular_diffuse_instance_render_data& data)
+void set_instance_data(const GLuint id, const Specular_diffuse_material_data& data)
 {
 	const glm::vec4& diffuse_color = data.diffuse_color;
-	glUniform4f(glGetUniformLocation(id, "per_instance.diffuse_color"), diffuse_color.x, diffuse_color.y, diffuse_color.z, diffuse_color.w);
+	glUniform4f(glGetUniformLocation(id, "material.diffuse_color"), diffuse_color.x, diffuse_color.y, diffuse_color.z, diffuse_color.w);
 	const glm::vec3& specular_color = data.specular_color;
-	glUniform3f(glGetUniformLocation(id, "per_instance.specular_color"), specular_color.x, specular_color.y, specular_color.z);
+	glUniform3f(glGetUniformLocation(id, "material.specular_color"), specular_color.x, specular_color.y, specular_color.z);
 	const glm::vec3& ambient_color = data.ambient_color;
-	glUniform3f(glGetUniformLocation(id, "per_instance.ambient_color"), ambient_color.x, ambient_color.y, ambient_color.z);
+	glUniform3f(glGetUniformLocation(id, "material.ambient_color"), ambient_color.x, ambient_color.y, ambient_color.z);
 	const glm::vec4& intensities = data.intensities;
-	glUniform4f(glGetUniformLocation(id, "per_instance.intensities"), intensities.x, intensities.y, intensities.z, intensities.w);
+	glUniform4f(glGetUniformLocation(id, "material.intensities"), intensities.x, intensities.y, intensities.z, intensities.w);
 	glActiveTexture(GL_TEXTURE0);
-	glUniform1i(glGetUniformLocation(id, "per_instance.albedo_tex"), 0);
+	glUniform1i(glGetUniformLocation(id, "material."), 0);
 	glBindTexture(GL_TEXTURE_2D, data.albedo_texture->id);
+}
+
+void set_textures(const GLuint id, const int* diffuse, unsigned diffuse_count, const int* specular, unsigned specular_count)
+{
+	char location_string[128]{'\0'};
+	diffuse_count = glm::min(diffuse_count, MAX_TEXTURE_COUNT);
+	unsigned int i = 0;
+	for (; i < diffuse_count; ++i)
+	{
+		sprintf_s(location_string, "material.texture_diffuse_[%d]", i);
+		glUniform1i(glGetUniformLocation(id, location_string), i);
+		glBindTexture(GL_TEXTURE_2D, diffuse[i]);
+	}
 }
 
 void render
@@ -84,7 +96,7 @@ void render
 	const Things_to_render* things_to_render
 )
 {
-	//TODO: @performance cache uniform location once per shader
+	//TODO: @performance Cache uniform location once per shader
 
 	const glm::mat4x4& view_matrix = per_frame_render_data->view_matrix;
 	const glm::mat4x4& projection_matrix = per_frame_render_data->projection_matrix;
@@ -150,7 +162,7 @@ void render
 	{
 		const Mesh_render_data& mesh_data = specular_diffuse.meshes[mesh_index];
 		Mesh* mesh = mesh_data.mesh;
-		const Specular_diffuse_instance_render_data* per_instance_data_array = specular_diffuse.per_instance_data[mesh_index];
+		const Specular_diffuse_material_data* material_data_array = specular_diffuse.material_data[mesh_index];
 		glBindVertexArray(mesh->vao);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, mesh->ibo);
 		glBindBuffer(GL_ARRAY_BUFFER, mesh->vbo);
@@ -172,9 +184,9 @@ void render
 			glUniformMatrix4fv(glGetUniformLocation(shader_id, "model_matrix"), 1, GL_FALSE, glm::value_ptr(model_matrix));
 			glUniformMatrix4fv(glGetUniformLocation(shader_id,"model_inv_trans_matrix"), 1,GL_FALSE, glm::value_ptr(model_inv_trans_matrix));
 
-			const Specular_diffuse_instance_render_data& per_instance_data = per_instance_data_array[instance_index];
+			const Specular_diffuse_material_data& material_data = material_data_array[instance_index];
 
-			set_instance_data(shader_id, per_instance_data);
+			set_instance_data(shader_id, material_data);
 
 			glDrawElements(GL_TRIANGLES, mesh->index_count, GL_UNSIGNED_INT, nullptr);
 		}

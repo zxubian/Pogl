@@ -13,6 +13,7 @@ const char* vertex_col_frag_path = "./data/shaders/vertex_col.frag";
 const char* specular_diffuse_vert_path = "./data/shaders/specular_diffuse.vert";
 const char* specular_diffuse_frag_path = "./data/shaders/specular_diffuse.frag";
 const char* texture_path = "./data/textures/uv_checker.png";
+const char* bunny_path = "./data/models/bunny.obj";
 
 // Fragment Shader:
 
@@ -152,6 +153,8 @@ int main()
 
 	glfwSwapInterval(0);
 
+	//Model* model = new Model(bunny_path);
+
 	Program_render_data program_render_data
 	{
 		vertex_col_shader.id,
@@ -180,7 +183,7 @@ int main()
 	Mesh* tetrahedron = create_tetrahedron();
 	Mesh* plane = create_plane();
 	Texture* texture = new Texture(texture_path);
-	texture->load_texture();
+	texture->load_texture_rgba();
 
 	Mesh_render_data vertex_col_mesh
 	{
@@ -245,35 +248,35 @@ int main()
 		spot_light_count
 	};
 
-	Specular_diffuse_instance_render_data tetrahedron1
+	Specular_diffuse_material_data tetrahedron1
 	{
-		glm::vec4(1,1,1,1),
+		glm::vec4(1,1,0,1),
 		glm::vec3(1,1,1),
 		glm::vec3(0.1,0.1,0.1),
 		glm::vec4(1,1,64,1),
 		texture
 	};
 
-	Specular_diffuse_instance_render_data* tetrahedron_data = new Specular_diffuse_instance_render_data[1]
+	Specular_diffuse_material_data* tetrahedron_data = new Specular_diffuse_material_data[1]
 	{
 		tetrahedron1
 	};
 
-	Specular_diffuse_instance_render_data plane1
+	Specular_diffuse_material_data plane1
 	{
 		glm::vec4(1,1,1,1),
 		glm::vec3(1,1,1),
-		glm::vec3(0,0,0),
+		glm::vec3(0.05,0.05,0.05),
 		glm::vec4(1,1,64,1),
 		texture
 	};
 
-	Specular_diffuse_instance_render_data* plane_data = new Specular_diffuse_instance_render_data[1]
+	Specular_diffuse_material_data* plane_data = new Specular_diffuse_material_data[1]
 	{
 		plane1
 	};
 
-	Specular_diffuse_instance_render_data** specular_diffuse_instance_data = new Specular_diffuse_instance_render_data * [2]
+	Specular_diffuse_material_data** specular_diffuse_instance_data = new Specular_diffuse_material_data * [2]
 	{
 		tetrahedron_data,
 		plane_data

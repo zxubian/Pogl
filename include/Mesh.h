@@ -2,11 +2,12 @@
 
 #include <gl/glew.h>
 
+class Texture;
+
 class Mesh
 {
 public:
 	Mesh();
-
 	void create_mesh
 	(
 		const GLfloat* vertices,
@@ -14,7 +15,19 @@ public:
 		const GLfloat* normals,
 		const unsigned char* colors,
 		const unsigned int* indices,
-		GLsizei vertex_count, GLsizei index_count
+		GLsizei vertex_count, GLsizei index_count,
+		Texture** diffuse_maps,
+		unsigned int diffuse_count
+	);
+	void Mesh::create_mesh
+	(
+		const GLfloat* vertices,
+		const GLfloat* tex_coords,
+		const GLfloat* normals,
+		const unsigned int* indices,
+		GLsizei vertex_count, GLsizei index_count,
+		Texture** diffuse_maps,
+		unsigned int diffuse_count
 	);
 	void clear_mesh();
 	void positions_attribute_pointer(GLuint attribute_location)const;
@@ -23,6 +36,8 @@ public:
 	void texcoords_attribute_pointer(GLuint attribute_location)const;
 	GLuint vao, vbo, ibo;
 	GLsizei index_count;
+	Texture** diffuse_maps;
+	unsigned int diffuse_count;
 	~Mesh();
 private:
 	GLintptr vertex_size;

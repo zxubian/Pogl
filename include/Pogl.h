@@ -11,12 +11,14 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/quaternion.hpp>
 #include <glm/gtx/quaternion.hpp>
+#include <assimp/Importer.hpp>
 
 #include <iostream>
 #include <vector>
 
 #include "Camera.h"
 #include "Mesh.h"
+#include "Model.h"
 #include "PoglWindow.h"
 #include "Render.h"
 #include "Shader.h"
